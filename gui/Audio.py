@@ -3,7 +3,8 @@
 https://app.assembla.com/spaces/portaudio/git/source/master/test/patest_wire.c
 """
 import argparse
-
+import time
+from threading import Thread
 import sounddevice as sd
 import numpy  # Make sure NumPy is loaded before it is used in the callback
 assert numpy  # avoid "imported but unused" message (W0611)
@@ -50,31 +51,86 @@ def callback(indata, outdata, frames, time, status):
         print(status)
     outdata[:] = indata
 
-sd.default.device = [1,9]
+
 print('default.device='+str(sd.default.device))
 SAMPLERATE = 44100
 CHANNEL1 = 2 # python -m sounddevice
 CHANNEL2 = 61
-OUTPUT_DEVICE = sd.query_devices(2)
-##sd.default.device = sd.query_devices()
 
-try:
+##sd.default.device = sd.query_devices()
+print (sd.query_devices())
+survivorSpeaker = int(input("Survivor Speaker num:"))
+survivorMic = int(input("Survivor Mic num:"))
+responderSpeaker = int(input("Responder Speaker num:"))
+responderMic = int(input("Responder Mic num:"))
+
+def responderComs():
+    print("responder coms started")
+    sd.default.device = [responderMic,survivorSpeaker] #input/output   Microphone Array (Realtek High / Headphones (Realtek High Defin
     with sd.Stream(device=(sd.default.device),
-                   samplerate=args.samplerate, blocksize=args.blocksize,
-                   dtype=args.dtype, latency=args.latency,
-                   channels=args.channels, callback=callback):
-    # with sd.Stream(device=(args.input_device, args.output_device),
-    #                samplerate=args.samplerate, blocksize=args.blocksize,
-    #                dtype=args.dtype, latency=args.latency,
-    #                channels=args.channels, callback=callback):
-        print('#' * 80)
-        print('output_device'+str(args.output_device))
-        print('input_device'+str(args.input_device))
-        print('query'+str(OUTPUT_DEVICE) )
-        print('press Return to quit')
-        print('#' * 80)
-        input()
-except KeyboardInterrupt:
-    parser.exit('')
-except Exception as e:
-    parser.exit(type(e).__name__ + ': ' + str(e))
+                    samplerate=args.samplerate, blocksize=args.blocksize,
+                    dtype=args.dtype, latency=args.latency,
+                    channels=args.channels, callback=callback):
+            print('#' * 80)
+            print('press Return to quit respondercoms')
+            print('#' * 80)
+            input()
+    # try:
+    #     with sd.Stream(device=(sd.default.device),
+    #                 samplerate=args.samplerate, blocksize=args.blocksize,
+    #                 dtype=args.dtype, latency=args.latency,
+    #                 channels=args.channels, callback=callback):
+    #     # with sd.Stream(device=(args.input_device, args.output_device),
+    #     #                samplerate=args.samplerate, blocksize=args.blocksize,
+    #     #                dtype=args.dtype, latency=args.latency,
+    #     #                channels=args.channels, callback=callback):
+    #         print('#' * 80)
+    #         #print('query'+str(OUTPUT_DEVICE) )
+    #         print('press Return to quit respondercoms')
+    #         print('#' * 80)
+    #         input()
+    # except KeyboardInterrupt:
+    #     print('responder keybaord interrupt')
+    #     parser.exit('')
+    # except Exception as e:
+    #     print('responder exception')
+    #     parser.exit(type(e).__name__ + ': ' + str(e))
+
+def survivorComs():
+    print('#' * 80)
+    print("survivor coms started")
+    # print('survivorMic:'+str(sd.query_devices(survivorMic)))
+    # print('responderSpeaker:'+str(sd.query_devices(responderSpeaker)))
+    sd.default.device = [survivorMic,responderSpeaker] #input/output    Microphone (HD Pro Webcam C920)/Headset Earphone (Razer Audio C
+    
+
+    with sd.Stream(device=(sd.default.device),
+                    samplerate=args.samplerate, blocksize=args.blocksize,
+                    dtype=args.dtype, latency=args.latency,
+                    channels=args.channels, callback=callback):
+            print('#' * 80)
+            print('press Return to quit survivorcoms')
+            print('#' * 80)
+            input()
+    # try:
+    #     with sd.Stream(device=(sd.default.device),
+    #                 samplerate=args.samplerate, blocksize=args.blocksize,
+    #                 dtype=args.dtype, latency=args.latency,
+    #                 channels=args.channels, callback=callback):
+    #     # with sd.Stream(device=(args.input_device, args.output_device),
+    #     #                samplerate=args.samplerate, blocksize=args.blocksize,
+    #     #                dtype=args.dtype, latency=args.latency,
+    #     #                channels=args.channels, callback=callback):
+    #         print('#' * 80)
+    #         #print('query'+str(OUTPUT_DEVICE) )
+    #         print('press Return to quit survivorcoms')
+    #         print('#' * 80)
+    #         input()
+    # except KeyboardInterrupt:
+    #     parser.exit('')
+    # except Exception as e:
+
+print(survivorMic)
+Thread(target = responderComs).start()
+Thread(target = survivorComs).start()
+#responderComs()
