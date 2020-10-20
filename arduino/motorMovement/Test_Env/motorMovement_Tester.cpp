@@ -1,11 +1,17 @@
 #include "VarSpeedServo_Mock.h"
 
+//mock includes
+#include <chrono>
+#include <thread>
+
 //Mocked Definitions
 int A0 = 0;
 int A1 = 1;
 int A4 = 4;
 int LOW = 0;
 int HIGH = 3;
+int INPUT = 1;
+int OUTPUT = 1;
 
 //Control and Feedback Pins
 //regular 180 servos
@@ -52,6 +58,27 @@ VarSpeedServo_Mock phoneMountServo;
 
 enum Command {PITCH, YAW, ROLL, CLOSE, OPEN, PORTRAIT,
               LANDSCAPE, NOD, SHAKE, TILT, SHUTDOWN};
+
+//Mocked Functions
+void delay(int val){
+  std::this_thread::sleep_for(std::chrono::milliseconds(val));
+}
+
+void digitalWrite(int x, int y){
+  //do nothing
+}
+
+int analogRead(int x){
+  return (x + 1);
+}
+
+void pinMode(int x, int y){
+  //do nothing
+}
+
+int pulseIn(int x, int y){
+  return (x + y);
+}
 
 /*******************************************************************/
 /*Phone Mount Functions*/
@@ -166,45 +193,6 @@ void nod(){
 }
 /*******************************************************************/
 /*Turn Table Motor Functions*/
-void shake(){
-  setYaw((TABLETOP_LEFT + TABLETOP_FRONT)/2);
-  delay(100);
-  setYaw((TABLETOP_RIGHT + TABLETOP_FRONT)/2);
-  delay(100);
-  setYaw(TABLETOP_FRONT);
-}
-
-void _shutdown() {
-  setYaw(TABLETOP_FRONT);
-  portrait();
-  delay(100);
-  down();
-  delay(100);
-  // blink LED then off
-  for (int i = 0; i < 3; i++) {
-    digitalWrite(ledPin, LOW);
-    delay(500);
-    digitalWrite(ledPin, HIGH);
-    delay(500);
-  }
-  sendPosition();
-  //stop all motor movement. will need to unplug and plug back in to move again
-  //while(true) {}
-}
-
-/*Emergency Shut Down*/
-void emergencyShutdown(){
-  //stop all motor movement. will need to unplug and plug back in to move again
-  while(true) {}
-}
-
-void setPitch(char val) {
-  int leftVal = map(val, 0, 90, LEFT_BASE_DOWN, LEFT_BASE_UP);
-  int rightVal = map(val, 0, 90, RIGHT_BASE_DOWN, RIGHT_BASE_UP);
-  leftBaseServo.write(leftVal, 40);
-  rightBaseServo.write(rightVal, 40);
-}
-
 void setYaw(int val) {
 //  int offset = 0;
   int currPos = getPositionTabletop();
@@ -251,9 +239,12 @@ void setYaw(int val) {
   tabletopServo.writeMicroseconds(1500);
 }
 
-void setRoll(char val) {
-  int pos = map(val, 0, 90, PHONEMOUNT_PORTRAIT, PHONEMOUNT_LANDSCAPE);
-  phoneMountServo.write(pos, 40, true);
+void shake(){
+  setYaw((TABLETOP_LEFT + TABLETOP_FRONT)/2);
+  delay(100);
+  setYaw((TABLETOP_RIGHT + TABLETOP_FRONT)/2);
+  delay(100);
+  setYaw(TABLETOP_FRONT);
 }
 
 void sendPosition() {
@@ -262,6 +253,42 @@ void sendPosition() {
   pos[1] = map(getPositionTabletop(), TABLETOP_LEFT, TABLETOP_RIGHT, 0, 180);
   pos[2] = map(phoneMountServo.read(), PHONEMOUNT_PORTRAIT, PHONEMOUNT_LANDSCAPE, 0, 90);
   Serial.write(pos, 3);
+}
+
+void _shutdown() {
+  setYaw(TABLETOP_FRONT);
+  portrait();
+  delay(100);
+  down();
+  delay(100);
+  // blink LED then off
+  for (int i = 0; i < 3; i++) {
+    digitalWrite(ledPin, LOW);
+    delay(500);
+    digitalWrite(ledPin, HIGH);
+    delay(500);
+  }
+  sendPosition();
+  //stop all motor movement. will need to unplug and plug back in to move again
+  //while(true) {}
+}
+
+/*Emergency Shut Down*/
+void emergencyShutdown(){
+  //stop all motor movement. will need to unplug and plug back in to move again
+  while(true) {}
+}
+
+void setPitch(char val) {
+  int leftVal = map(val, 0, 90, LEFT_BASE_DOWN, LEFT_BASE_UP);
+  int rightVal = map(val, 0, 90, RIGHT_BASE_DOWN, RIGHT_BASE_UP);
+  leftBaseServo.write(leftVal, 40);
+  rightBaseServo.write(rightVal, 40);
+}
+
+void setRoll(char val) {
+  int pos = map(val, 0, 90, PHONEMOUNT_PORTRAIT, PHONEMOUNT_LANDSCAPE);
+  phoneMountServo.write(pos, 40, true);
 }
 
 void test() {
