@@ -1,9 +1,10 @@
 #include <iostream>
 class VarSpeedServo_Mock {
   public:
+    int write_3_input = 0;
     int pin_num = 0;
     void wait(){
-      //code
+      std::cout << "waiting" << std::endl;
     }
     int read(){
       return 10;
@@ -14,14 +15,14 @@ class VarSpeedServo_Mock {
     void write(int){
       //code
     }
-    void write(int, int, bool){
-      //code
+    void write(int x, int y, bool z){
+      write_3_input = x;
     }
     void attach(int){
       //code
     }
-    void writeMicroseconds(int){
-      //code
+    void writeMicroseconds(int x){
+      std::cout << "writeMicroseconds " << x << std::endl;
     }
 };
 

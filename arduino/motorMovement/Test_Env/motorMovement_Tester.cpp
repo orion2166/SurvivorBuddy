@@ -9,7 +9,7 @@ int A0 = 0;
 int A1 = 1;
 int A4 = 4;
 int LOW = 0;
-int HIGH = 3;
+int HIGH = 1000;
 int INPUT = 1;
 int OUTPUT = 1;
 
@@ -83,6 +83,10 @@ void pinMode(int x, int y){
 
 int pulseIn(int x, int y){
   return (x + y);
+}
+
+int setRoll_tester() {
+  return phoneMountServo.write_3_input;
 }
 
 /*******************************************************************/
