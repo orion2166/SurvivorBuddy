@@ -2,6 +2,7 @@
 class VarSpeedServo_Mock {
   public:
     int write_3_input = 0;
+    int write_2_input = 0;
     int pin_num = 0;
     void wait(){
       std::cout << "waiting" << std::endl;
@@ -9,8 +10,8 @@ class VarSpeedServo_Mock {
     int read(){
       return 10;
     }
-    void write(int, int) {
-      /* code */
+    void write(int x, int y) {
+      write_2_input = x;
     };
     void write(int){
       //code

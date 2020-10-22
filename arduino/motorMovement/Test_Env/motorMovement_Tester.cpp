@@ -89,6 +89,14 @@ int setRoll_tester() {
   return phoneMountServo.write_3_input;
 }
 
+int setPitchLeft_tester() {
+  return leftBaseServo.write_2_input;
+}
+
+int setPitchRight_tester() {
+  return rightBaseServo.write_2_input;
+}
+
 /*******************************************************************/
 /*Phone Mount Functions*/
 void portrait(){ //phoneMountServo moves phone to portrait position
