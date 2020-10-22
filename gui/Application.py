@@ -7,6 +7,7 @@ from ControlButtons import ControlButtons
 from NotificationsFrame import NotificationFrame
 from StatusBar import StatusBar
 from SerialArmController import SerialArmController
+from CamThread import camThread
 from datetime import datetime   #For log file formatting
 from Audio import Audio
 import os.path
@@ -41,6 +42,11 @@ class Application(tk.Frame):
         self.serial_arm_controller = SerialArmController(self.status_bar, self.notifications_frame)
 
         self.create_widgets()
+
+        self.thread1 = camThread("Camera 1", 0)
+        self.thread2 = camThread("Camera 2", 1)
+        self.thread1.start()
+        self.thread2.start()
         
         
     def create_widgets(self):
