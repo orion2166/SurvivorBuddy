@@ -55,11 +55,16 @@ VarSpeedServo_Mock leftBaseServo;
 VarSpeedServo_Mock rightBaseServo;
 VarSpeedServo_Mock tabletopServo;
 VarSpeedServo_Mock phoneMountServo;
+Serial serial;
 
 enum Command {PITCH, YAW, ROLL, CLOSE, OPEN, PORTRAIT,
               LANDSCAPE, NOD, SHAKE, TILT, SHUTDOWN};
 
 //Mocked Functions
+long map(long x, long in_min, long in_max, long out_min, long out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 void delay(int val){
   std::this_thread::sleep_for(std::chrono::milliseconds(val));
 }
@@ -252,7 +257,7 @@ void sendPosition() {
   pos[0] = map(rightBaseServo.read(), RIGHT_BASE_DOWN, RIGHT_BASE_UP, 0, 90);
   pos[1] = map(getPositionTabletop(), TABLETOP_LEFT, TABLETOP_RIGHT, 0, 180);
   pos[2] = map(phoneMountServo.read(), PHONEMOUNT_PORTRAIT, PHONEMOUNT_LANDSCAPE, 0, 90);
-  Serial.write(pos, 3);
+  serial.write(pos, 3);
 }
 
 void _shutdown() {
@@ -298,8 +303,8 @@ void test() {
 
 /*******************************************************************/
 void setup() {
-  Serial.begin(9600);
-  Serial.setTimeout(100);
+  serial.begin(9600);
+  serial.setTimeout(100);
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
@@ -334,8 +339,8 @@ void loop() {
 //  test();
 
   numLoops++;
-  if (Serial.available() > 0) {//serial is reading stuff
-    Serial.readBytes(serialData, 2);
+  if (serial.available() > 0) {//serial is reading stuff
+    serial.readBytes(serialData, 2);
     if (serialData[0] == 0x00) { // set pitch
       if (0 <= serialData[1] && serialData[1] <= 90) {
         setPitch(serialData[1]);
