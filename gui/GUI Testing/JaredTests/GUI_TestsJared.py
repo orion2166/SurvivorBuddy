@@ -32,7 +32,6 @@ class Testing(Tk.Frame):
 			print(txt_If_True)
 		else:
 			print(txt_If_False)
-
 		print("\n\n")
 
 	# Function Block 1

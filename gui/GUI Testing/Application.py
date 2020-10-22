@@ -118,7 +118,8 @@ class Application(tk.Frame):
         :param dev: The serial device to connect to
         '''
 
-        self.serial_arm_controller.connect(dev[0])
+        # self.serial_arm_controller.connect(dev[0])
+        return 1
         self.device_menu.add_command(
             label="Close Connection",
             command=self.close
@@ -150,10 +151,10 @@ class Application(tk.Frame):
         
         
 
-if __name__ == "__main__":
-    root = tk.Tk()
-    root.geometry("800x600")
-    app = Application(master=root)
-    app.master.title("Survivor Buddy 3.0")
-    root.protocol("WM_DELETE_WINDOW", app.close_app)
-    app.mainloop()
+# if __name__ == "__main__":
+#     root = tk.Tk()
+#     root.geometry("800x600")
+#     app = Application(master=root)
+#     app.master.title("Survivor Buddy 3.0")
+#     root.protocol("WM_DELETE_WINDOW", app.close_app)
+#     app.mainloop()

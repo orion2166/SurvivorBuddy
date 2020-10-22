@@ -88,8 +88,8 @@ class SerialArmController:
         '''
 
         if not self.is_connected:
-            self._device = serial.Serial(comport, timeout=1)
-            self.status_bar.set_status("CONNECTED")
+            # self._device = serial.Serial(comport, timeout=1)
+            # self.status_bar.set_status("CONNECTED")
             self.is_connected = True
         
         
@@ -126,10 +126,9 @@ class SerialArmController:
             return data
 
 
-    def update_position(self):
+    def update_position(self,pos):
         '''Updates the current stored position'''
 
-        pos = self.recv()
         if pos:
             self.position.pitch = int(pos[0])
             self.position.yaw = int(pos[1] - 90)
@@ -145,7 +144,7 @@ class SerialArmController:
 
         # val is one byte
         if self.is_connected:
-            self.send(bytes((Command.PITCH, val)))
+            return(bytes((Command.PITCH, val)))
             
 
     def set_yaw(self, val):
@@ -157,7 +156,7 @@ class SerialArmController:
 
         # val is 1 byte
         if self.is_connected:
-            self.send(bytes((Command.YAW, val + 90)))
+            return(bytes((Command.YAW, val + 90)))
             
 
     def set_roll(self, val):
@@ -169,7 +168,7 @@ class SerialArmController:
 
         # val is one byte
         if self.is_connected:
-            self.send(bytes((Command.ROLL, val)))
+            return(bytes((Command.ROLL, val)))
 
             
     def close_arm(self):
