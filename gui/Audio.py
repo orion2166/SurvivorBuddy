@@ -71,8 +71,8 @@ class Audio():
         deviceList = sd.query_devices()
         newList = {}
         for index, i in enumerate(deviceList):
-            #print(i)
-            if (i['hostapi'] ==0):
+            #if (i['hostapi'] ==0):
+            if (0 ==0):
                 newList[i['name']] = index
         print(newList)
         return newList
@@ -80,24 +80,24 @@ class Audio():
     def setSurvivorSpeaker(self, survivorSpeaker):
         print("set survivorSpeaker with "+str(survivorSpeaker))
         self.survivorSpeaker = survivorSpeaker
-        if (self.responderMic != -1 and self.responderSpeaker != -1 and self.survivorMic != -1 and self.survivorSpeaker != -1):
-            self.startComs()
+        self.checkComsReady()
 
     def setSurvivorMic(self, survivorMic):
         print("set survivorMic with "+str(survivorMic))
         self.survivorMic = survivorMic
-        if (self.responderMic != -1 and self.responderSpeaker != -1 and self.survivorMic != -1 and self.survivorSpeaker != -1):
-            self.startComs()
+        self.checkComsReady()
 
     def setResponderSpeaker(self, responderSpeaker):
         print("set responderSpeaker with "+str(responderSpeaker))
         self.responderSpeaker = responderSpeaker
-        if (self.responderMic != -1 and self.responderSpeaker != -1 and self.survivorMic != -1 and self.survivorSpeaker != -1):
-            self.startComs()
+        self.checkComsReady()
 
     def setResponderMic(self, responderMic):
         print("set responderMic with "+str(responderMic))
         self.responderMic = responderMic
+        self.checkComsReady()
+
+    def checkComsReady(self):
         if (self.responderMic != -1 and self.responderSpeaker != -1 and self.survivorMic != -1 and self.survivorSpeaker != -1):
             self.startComs()
 
@@ -116,32 +116,11 @@ class Audio():
                 print('press Return to quit respondercoms')
                 print('#' * 80)
                 input()
-        # try:
-        #     with sd.Stream(device=(sd.default.device),
-        #                 samplerate=args.samplerate, blocksize=args.blocksize,
-        #                 dtype=args.dtype, latency=args.latency,
-        #                 channels=args.channels, callback=callback):
-        #     # with sd.Stream(device=(args.input_device, args.output_device),
-        #     #                samplerate=args.samplerate, blocksize=args.blocksize,
-        #     #                dtype=args.dtype, latency=args.latency,
-        #     #                channels=args.channels, callback=callback):
-        #         print('#' * 80)
-        #         #print('query'+str(OUTPUT_DEVICE) )
-        #         print('press Return to quit respondercoms')
-        #         print('#' * 80)
-        #         input()
-        # except KeyboardInterrupt:
-        #     print('responder keybaord interrupt')
-        #     parser.exit('')
-        # except Exception as e:
-        #     print('responder exception')
-        #     parser.exit(type(e).__name__ + ': ' + str(e))
+
 
     def survivorComs(self):
         print('#' * 80)
         print("survivor coms started")
-        # print('survivorMic:'+str(sd.query_devices(survivorMic)))
-        # print('responderSpeaker:'+str(sd.query_devices(responderSpeaker)))
         sd.default.device = [self.survivorMic,self.responderSpeaker] #input/output    Microphone (HD Pro Webcam C920)/Headset Earphone (Razer Audio C
         
 
@@ -154,26 +133,6 @@ class Audio():
                 print('press Return to quit survivorcoms')
                 print('#' * 80)
                 input()
-        # try:
-        #     with sd.Stream(device=(sd.default.device),
-        #                 samplerate=args.samplerate, blocksize=args.blocksize,
-        #                 dtype=args.dtype, latency=args.latency,
-        #                 channels=args.channels, callback=callback):
-        #     # with sd.Stream(device=(args.input_device, args.output_device),
-        #     #                samplerate=args.samplerate, blocksize=args.blocksize,
-        #     #                dtype=args.dtype, latency=args.latency,
-        #     #                channels=args.channels, callback=callback):
-        #         print('#' * 80)
-        #         #print('query'+str(OUTPUT_DEVICE) )
-        #         print('press Return to quit survivorcoms')
-        #         print('#' * 80)
-        #         input()
-        # except KeyboardInterrupt:
-        #     parser.exit('')
-        # except Exception as e:
-
-
-    
 
 # audio = Audio()
 # audio.createDeviceList()
