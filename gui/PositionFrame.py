@@ -82,7 +82,7 @@ class PositionUpdater(Thread):
 class LabelScaleSpinbox(tk.Frame):
     '''A custom class to combine Tk Scale and Spinbox and keep them in sync'''
 
-    def __init__(self, master, text="", from_=0, to=10, axis=0, dev=None, **kwargs):
+    def __init__(self, master, text="", from_Lable ="", to_Lable ="",from_=0, to=10, axis=0, dev=None, **kwargs):
         '''
         Constructor for LabelScaleSpinbox
         
@@ -105,14 +105,14 @@ class LabelScaleSpinbox(tk.Frame):
             self.label = ttk.Label(self, text=text)
             self.label.pack(side="left")
         
-        self.from_label = ttk.Label(self, text=str(from_))
+        self.from_label = ttk.Label(self, text=from_Lable)
         self.from_label.pack(side="left")
         
         self.slider = ttk.Scale(self, from_=from_, to=to, orient="horizontal", length=200)
         self.slider.bind("<ButtonRelease-1>", self.sliderUpdate)
         self.slider.pack(side="left")
         
-        self.to_label = ttk.Label(self, text=str(to))
+        self.to_label = ttk.Label(self, text=to_Lable)
         self.to_label.pack(side="left")
         
         spinbox_vcmd = self.register(self.validate_spinbox)
@@ -250,6 +250,7 @@ class RenderDiagram(tk.Frame):
         self.ax.set_ylim(bottom=-2, top=2, emit=True, auto=False)
         self.ax.set_zlim(bottom=0, top=4, emit=True, auto=False)
         self.ax.set_xlabel('FRONT')
+        self.ax.set_ylabel('LEFT')
 
 
     def update_render(self, master, new_yaw, new_pitch, new_roll):
@@ -395,15 +396,15 @@ class PositionFrame(tk.Frame):
         '''
 
         self.pitch_control = LabelScaleSpinbox(
-            master, text="Pitch: ", from_=0, to=90, axis=0, dev=self.serial_arm_controller)
+            master, text="Red: ", from_Lable = "Down",to_Lable = "Up",from_=0, to=90, axis=0, dev=self.serial_arm_controller)
         self.pitch_control.pack()
         
         self.yaw_control = LabelScaleSpinbox(
-            master, text="Yaw: ", from_=-90, to=90, axis=1, dev=self.serial_arm_controller)
+            master, text="Green: ", from_Lable = "Left",to_Lable = "Right",from_=-90, to=90, axis=1, dev=self.serial_arm_controller)
         self.yaw_control.pack()
         
         self.roll_control = LabelScaleSpinbox(
-            master, text="Roll: ", from_=0, to=90, axis=2, dev=self.serial_arm_controller)
+            master, text="Blue: ", from_Lable = "Portrait",to_Lable = "Landscape",from_=0, to=90, axis=2, dev=self.serial_arm_controller)
         self.roll_control.pack()
 
 
