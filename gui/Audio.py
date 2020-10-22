@@ -67,12 +67,20 @@ class Audio():
             print(status)
         outdata[:] = indata
 
-    def createDeviceList(self):
+    def createOutputDeviceList(self):
         deviceList = sd.query_devices()
         newList = {}
         for index, i in enumerate(deviceList):
-            #if (i['hostapi'] ==0):
-            if (0 ==0):
+            if (i['max_input_channels'] ==0):
+                newList[i['name']] = index
+        print(newList)
+        return newList
+
+    def createInputDeviceList(self):
+        deviceList = sd.query_devices()
+        newList = {}
+        for index, i in enumerate(deviceList):
+            if (i['max_output_channels'] ==0):
                 newList[i['name']] = index
         print(newList)
         return newList
