@@ -96,28 +96,28 @@ class Application(tk.Frame):
         for key, value in deviceList.items():
             print(key)
             print(value)
-            self.device_menu.add_command(label=key, command=lambda: audio.setSurvivorMic(value))
+            self.device_menu.add_command(label=key, command=lambda value=value: audio.setSurvivorMic(value))
         self.device_menu.add_separator()
         root_menu.add_cascade(label="Mic Survivor", menu=self.device_menu)
 
         #Survivor speaker menu
         self.device_menu = tk.Menu(root_menu, tearoff=0)
         for key, value in deviceList.items():
-            self.device_menu.add_command(label=key, command=lambda: audio.setSurvivorSpeaker(value))
+            self.device_menu.add_command(label=key, command=lambda value=value: audio.setSurvivorSpeaker(value))
         self.device_menu.add_separator()
         root_menu.add_cascade(label="Speaker Survivor", menu=self.device_menu)
 
         #Responder mic menu
         self.device_menu = tk.Menu(root_menu, tearoff=0)
         for key, value in deviceList.items():
-            self.device_menu.add_command(label=key, command=lambda: audio.setResponderMic(value))
+            self.device_menu.add_command(label=key, command=lambda value=value: audio.setResponderMic(value))
         self.device_menu.add_separator()
         root_menu.add_cascade(label="Mic Responder", menu=self.device_menu)
 
         #Responder speaker menu
         self.device_menu = tk.Menu(root_menu, tearoff=0)
         for key, value in deviceList.items():
-            self.device_menu.add_command(label=key, command=lambda: audio.setResponderSpeaker(value))
+            self.device_menu.add_command(label=key, command=lambda value=value: audio.setResponderSpeaker(value))
         self.device_menu.add_separator()
         root_menu.add_cascade(label="Speaker Responder", menu=self.device_menu)
         
