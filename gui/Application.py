@@ -8,6 +8,7 @@ from NotificationsFrame import NotificationFrame
 from StatusBar import StatusBar
 from SerialArmController import SerialArmController
 from CamThread import camThread
+from CamThread import responderCamThread
 from datetime import datetime   #For log file formatting
 import os.path
 import webbrowser
@@ -42,11 +43,10 @@ class Application(tk.Frame):
 
         self.create_widgets()
 
-        self.thread1 = camThread("Camera 1", 0)
-        self.thread2 = camThread("Camera 2", 1)
+        self.thread1 = camThread("Survivor Cam", 0)
+        self.thread2 = responderCamThread("Responder Cam", 1, "Responder Cam Copy")
         self.thread1.start()
         self.thread2.start()
-        
         
     def create_widgets(self):
         '''Creates the widgets seen in the GUI'''
