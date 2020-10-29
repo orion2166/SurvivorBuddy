@@ -10,9 +10,11 @@ from SerialArmController import SerialArmController
 from CamThread import camThread
 from CamThread import responderCamThread
 from datetime import datetime   #For log file formatting
+from PIL import Image, ImageTk
 from Audio import Audio
 import os.path
 import webbrowser
+import cv2
 
 
 class Application(tk.Frame):
@@ -42,31 +44,50 @@ class Application(tk.Frame):
 
         self.serial_arm_controller = SerialArmController(self.status_bar, self.notifications_frame)
 
-        self.create_widgets()
-
-        self.thread1 = camThread("Survivor Cam", 0)
-        self.thread2 = responderCamThread("Responder Cam", 1, "Responder Cam Copy")
+        self.thread1 = camThread("Survivor Cam", 1)
+        #self.thread2 = responderCamThread("Responder Cam", 1, "Responder Cam Copy")
         self.thread1.start()
-        self.thread2.start()
+        #self.thread2.start()
+
+        self.vid = cv2.VideoCapture(0)
         
-    def create_widgets(self):
+        self.create_widgets(self.vid)
+
+    def create_widgets(self, vid):
         '''Creates the widgets seen in the GUI'''
 
         self.menu_bar = tk.Menu(self)
         self.create_menu(self.menu_bar)
         
+        self.canvas = tk.Canvas(self, width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.canvas.pack()
+
+        self.interval = 10
+        self.update_image()
+
         self.position_frame = PositionFrame(self, self.serial_arm_controller, self.logFile)
-        self.position_frame.pack(fill="x")
+        self.position_frame.pack(side=tk.LEFT)
         
         self.control_buttons = ControlButtons(self, self.serial_arm_controller, self.notifications_frame)
-        self.control_buttons.pack(fill="x")
+        self.control_buttons.pack(side=tk.LEFT)
         
-        self.notifications_frame.pack(fill="x")
+        self.notifications_frame.pack(side=tk.LEFT)
         
-        self.status_bar.pack(fill="x")
+        self.status_bar.pack()
         
         self.master.config(menu=self.menu_bar)
 
+    def update_image(self):
+        # Get the latest frame and convert image format
+        self.image = cv2.cvtColor(self.vid.read()[1], cv2.COLOR_BGR2RGB) # to RGB
+        self.image = Image.fromarray(self.image) # to PIL format
+        self.image = ImageTk.PhotoImage(self.image) # to ImageTk format
+ 
+        # Update image
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.image)
+ 
+        # Repeat every 'interval' ms
+        self.after(self.interval, self.update_image)
 
     def close_app(self):    #Had to make new quit function to close file
         '''Closes the GUI application'''
@@ -191,7 +212,8 @@ class Application(tk.Frame):
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.geometry("800x600")
+    root.geometry("1200x600")
+    root.state('zoomed')
     app = Application(master=root)
     app.master.title("Survivor Buddy 3.0")
     root.protocol("WM_DELETE_WINDOW", app.close_app)
