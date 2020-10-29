@@ -11,6 +11,7 @@ from CamThread import camThread
 from CamThread import responderCamThread
 from datetime import datetime   #For log file formatting
 from PIL import Image, ImageTk
+from Audio import Audio
 import os.path
 import webbrowser
 import cv2
@@ -110,11 +111,44 @@ class Application(tk.Frame):
         
         # Device Menu
         self.device_menu = tk.Menu(root_menu, tearoff=0)
-        
         self.device_menu.add_command(label="Refresh Devices", command=self.refresh_devices)
         self.device_menu.add_separator()
         
         root_menu.add_cascade(label="Device", menu=self.device_menu)
+
+        #Survivor mic menu
+        self.device_menu = tk.Menu(root_menu, tearoff=0)
+        audio = Audio()
+        inputDeviceList = audio.createInputDeviceList()
+        outputDeviceList = audio.createOutputDeviceList()
+
+        for key, value in inputDeviceList.items():
+            print(key)
+            print(value)
+            self.device_menu.add_command(label=key, command=lambda value=value: audio.setSurvivorMic(value))
+        self.device_menu.add_separator()
+        root_menu.add_cascade(label="Mic Survivor", menu=self.device_menu)
+
+        #Survivor speaker menu
+        self.device_menu = tk.Menu(root_menu, tearoff=0)
+        for key, value in outputDeviceList.items():
+            self.device_menu.add_command(label=key, command=lambda value=value: audio.setSurvivorSpeaker(value))
+        self.device_menu.add_separator()
+        root_menu.add_cascade(label="Speaker Survivor", menu=self.device_menu)
+
+        #Responder mic menu
+        self.device_menu = tk.Menu(root_menu, tearoff=0)
+        for key, value in inputDeviceList.items():
+            self.device_menu.add_command(label=key, command=lambda value=value: audio.setResponderMic(value))
+        self.device_menu.add_separator()
+        root_menu.add_cascade(label="Mic Responder", menu=self.device_menu)
+
+        #Responder speaker menu
+        self.device_menu = tk.Menu(root_menu, tearoff=0)
+        for key, value in outputDeviceList.items():
+            self.device_menu.add_command(label=key, command=lambda value=value: audio.setResponderSpeaker(value))
+        self.device_menu.add_separator()
+        root_menu.add_cascade(label="Speaker Responder", menu=self.device_menu)
         
         # Help Menu
         self.help_menu = tk.Menu(root_menu, tearoff=0)
@@ -122,7 +156,6 @@ class Application(tk.Frame):
         self.help_menu.add_command(label="User Manual", command=self.open_user_manual)
         self.help_menu.add_command(label="Programmer's Reference", command=self.open_programmer_reference)
         root_menu.add_cascade(label="Help", menu=self.help_menu)
-
 
     def refresh_devices(self):
         '''Refreshes the Devices menu'''
