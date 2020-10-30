@@ -64,7 +64,7 @@ class Application(tk.Frame):
         self.canvas = tk.Canvas(self, width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.canvas.pack(side=tk.LEFT, anchor=tk.NW)
 
-        self.canvas2 = tk.Canvas(self, width=100, height=100)
+        self.canvas2 = tk.Canvas(self, width = self.cam.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.canvas2.pack(side=tk.LEFT, anchor=tk.NE)
 
         self.interval = 10
