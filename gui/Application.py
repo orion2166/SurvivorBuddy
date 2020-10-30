@@ -44,36 +44,41 @@ class Application(tk.Frame):
 
         self.serial_arm_controller = SerialArmController(self.status_bar, self.notifications_frame)
 
-        self.thread1 = camThread("Survivor Cam", 1)
+        self.cam = cv2.VideoCapture(1)
+
+        self.thread1 = camThread("Survivor Cam", 1, self.cam)
         #self.thread2 = responderCamThread("Responder Cam", 1, "Responder Cam Copy")
         self.thread1.start()
         #self.thread2.start()
 
         self.vid = cv2.VideoCapture(0)
         
-        self.create_widgets(self.vid)
+        self.create_widgets(self.vid, self.cam)
 
-    def create_widgets(self, vid):
+    def create_widgets(self, vid, cam):
         '''Creates the widgets seen in the GUI'''
 
         self.menu_bar = tk.Menu(self)
         self.create_menu(self.menu_bar)
         
         self.canvas = tk.Canvas(self, width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.canvas.pack()
+        self.canvas.pack(side=tk.LEFT, anchor=tk.NW)
+
+        self.canvas2 = tk.Canvas(self, width=100, height=100)
+        self.canvas2.pack(side=tk.LEFT, anchor=tk.NE)
 
         self.interval = 10
         self.update_image()
 
-        self.position_frame = PositionFrame(self, self.serial_arm_controller, self.logFile)
-        self.position_frame.pack(side=tk.LEFT)
+        self.notifications_frame.pack(side=tk.BOTTOM)
         
         self.control_buttons = ControlButtons(self, self.serial_arm_controller, self.notifications_frame)
-        self.control_buttons.pack(side=tk.LEFT)
+        self.control_buttons.pack(side=tk.BOTTOM)
         
-        self.notifications_frame.pack(side=tk.LEFT)
-        
-        self.status_bar.pack()
+        self.position_frame = PositionFrame(self, self.serial_arm_controller, self.logFile)
+        self.position_frame.pack(side=tk.BOTTOM, anchor=tk.S)
+
+        self.status_bar.pack(side=tk.BOTTOM)
         
         self.master.config(menu=self.menu_bar)
 
@@ -85,7 +90,15 @@ class Application(tk.Frame):
  
         # Update image
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.image)
+    
+        # Get the latest frame and convert image format
+        self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
+        self.image2 = Image.fromarray(self.image2) # to PIL format
+        self.image2 = ImageTk.PhotoImage(self.image2) # to ImageTk format
  
+        # Update image
+        self.canvas2.create_image(0, 0, anchor=tk.NW, image=self.image2)
+
         # Repeat every 'interval' ms
         self.after(self.interval, self.update_image)
 
