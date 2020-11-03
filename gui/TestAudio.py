@@ -6,11 +6,24 @@ import sounddevice as sd
 class TestAudio(unittest.TestCase):
     
     def test_createOutputDeviceList(self):
-        listDevices = {'max_output_channels': 1, 'max_output_channels' : 2, 'max_output_channels' : 3}
+        dictChannels = {'name' : "test", 'max_output_channels': 1, 'name2' : "test2", 'max_input_channels': 1}
+        deviceListMock = [dictChannels]
+        deviceListExpected = {'test' : 0}
         audio = Audio()
         #audio.createOutputDeviceList = MagicMock(return_value=listDevices)
-        #sd.query_devices = MagicMock(return_value=listDevices)
-        self.assertEqual(audio.createOutputDeviceList(), audio.createOutputDeviceList())
+        sd.query_devices = MagicMock(return_value=deviceListMock)
+        self.assertEqual(audio.createOutputDeviceList(), deviceListExpected)
+
+    def test_createInputDeviceList(self):
+        dictChannels = {'name' : "test", 'max_output_channels': 1, 'name2' : "test2", 'max_input_channels': 1}
+        deviceListMock = [dictChannels]
+        deviceListExpected = {'test2' : 1}
+        audio = Audio()
+        #audio.createOutputDeviceList = MagicMock(return_value=listDevices)
+        sd.query_devices = MagicMock(return_value=deviceListMock)
+        self.assertEqual(audio.createInputDeviceList(), deviceListExpected)
+
+    
 
 if __name__ == '__main__':
     unittest.main()

@@ -45,11 +45,13 @@ class Audio():
     def createOutputDeviceList(self):
         deviceList = sd.query_devices()
         newList = {}
+        #print(deviceList)
+        #print(deviceList[0]['max_output_channels']+1)
         for index, i in enumerate(deviceList):
             #print(i['max_output_channels'])
             if (i['max_output_channels'] > 0):#used to check input==0
                 newList[i['name']] = index
-        print(newList)
+        #print(newList)
         return newList
 
     def createInputDeviceList(self):
@@ -58,7 +60,7 @@ class Audio():
         for index, i in enumerate(deviceList):
             if (i['max_input_channels'] > 0):
                 newList[i['name']] = index
-        print(newList)
+        #print(newList)
         return newList
 
     def setSurvivorSpeaker(self, survivorSpeaker):
@@ -85,19 +87,19 @@ class Audio():
         if (self.responderMic != -1 and self.survivorSpeaker != -1 and not self.responderComsOn):
             self.responderComsOn = True
             Thread(target = self.responderComs).start()
-        elif(self.responderComsOn):
-            self.stop_responderComs = True
-            self.responderComsOn = False
-            self.checkResponderComsReady()
+        # elif(self.responderComsOn):
+        #     self.stop_responderComs = True
+        #     self.responderComsOn = False
+        #     self.checkResponderComsReady()
 
     def checkSurvivorComsReady(self):
         if (self.survivorMic != -1 and self.responderSpeaker != -1 and not self.survivorComsOn):
             self.survivorComsOn = True
             Thread(target = self.survivorComs).start()
-        elif(self.survivorComsOn):
-            self.stop_survivorComs = True
-            self.survivorComsOn = False
-            self.checkSurvivorComsReady()
+        # elif(self.survivorComsOn):
+        #     self.stop_survivorComs = True
+        #     self.survivorComsOn = False
+        #     self.checkSurvivorComsReady()
             
 
     def responderComs(self):
@@ -109,9 +111,10 @@ class Audio():
                         dtype=sd.default.dtype, latency=sd.default.latency,
                         channels=sd.default.channels, callback=self.callback):
                 print('#' * 80, flush=True)
-                while True:
-                    if (self.stop_responderComs):
-                        break
+                # while True:
+                #     if (self.stop_responderComs):
+                #         break
+                input()
                 print("responderComs Stopped", flush=True)
                 
 
@@ -126,9 +129,10 @@ class Audio():
                         dtype=sd.default.dtype, latency=sd.default.latency,
                         channels=sd.default.channels, callback=self.callback):
                 print('#' * 80, flush=True)
-                while True:
-                    if (self.stop_survivorComs):
-                        break
+                # while True:
+                #     if (self.stop_survivorComs):
+                #         break
+                input()
                 print("survivorComs Stopped", flush=True)
 
 
