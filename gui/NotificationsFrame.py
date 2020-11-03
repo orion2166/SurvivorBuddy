@@ -26,7 +26,7 @@ class NotificationFrame(tk.Frame):
         
         self.text = tk.Text(self.scrollbar, height=4)
         self.text.config(state=tk.DISABLED)
-        self.text.pack()
+        self.text.pack(fill="x", expand=1)
     
 
     def append_line(self, line):

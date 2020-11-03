@@ -38,9 +38,20 @@ class Application(tk.Frame):
         file_name = 'LOGFILE_' + timestamp +'.txt'        
         self.logFile = open(os.path.join(os.path.realpath('../logs/'), file_name) , 'w+')   #Save logfile to log folder
 
+        self.topside = tk.Frame(self)
+        self.topside.pack(side="top", fill="x")
+
+        self.left = tk.Frame(self.topside)
+        self.left.pack(side="left")
+        self.right = tk.Frame(self.topside)
+        self.right.pack(side="left", fill=tk.BOTH)
+
+        self.bottom = tk.Frame(self)
+        self.bottom.pack(side="top", fill=tk.BOTH)
+
         # need the status bar to give to the arm controller
-        self.status_bar = StatusBar(self)
-        self.notifications_frame = NotificationFrame(self, self.logFile)
+        self.status_bar = StatusBar(self.right)
+        self.notifications_frame = NotificationFrame(self.bottom, self.logFile)
 
         self.serial_arm_controller = SerialArmController(self.status_bar, self.notifications_frame)
 
@@ -60,26 +71,26 @@ class Application(tk.Frame):
 
         self.menu_bar = tk.Menu(self)
         self.create_menu(self.menu_bar)
-        
-        self.canvas = tk.Canvas(self, width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.canvas.pack(side=tk.LEFT, anchor=tk.NW)
 
-        self.canvas2 = tk.Canvas(self, width = self.cam.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        self.canvas2.pack(side=tk.LEFT, anchor=tk.NE)
+        self.canvas = tk.Canvas(self.left, width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.canvas.pack()
+
+        self.canvas2 = tk.Canvas(self.bottom, width = 0.25*self.cam.get(cv2.CAP_PROP_FRAME_WIDTH), height = 0.25*self.cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        self.canvas2.pack(side="left", expand=0)
+
+        self.notifications_frame.pack(side="left", fill="x", expand=1)
 
         self.interval = 10
         self.update_image()
 
-        self.notifications_frame.pack(side=tk.BOTTOM)
-        
-        self.control_buttons = ControlButtons(self, self.serial_arm_controller, self.notifications_frame)
-        self.control_buttons.pack(side=tk.BOTTOM)
-        
-        self.position_frame = PositionFrame(self, self.serial_arm_controller, self.logFile)
-        self.position_frame.pack(side=tk.BOTTOM, anchor=tk.S)
+        self.position_frame = PositionFrame(self.right, self.serial_arm_controller, self.notifications_frame, self.logFile)
+        self.position_frame.pack(side="top", expand=0)
 
-        self.status_bar.pack(side=tk.BOTTOM)
-        
+        self.control_buttons = ControlButtons(self.right, self.serial_arm_controller, self.notifications_frame)
+        self.control_buttons.pack(side="left", expand=1)
+
+        self.status_bar.pack(side="left", expand=1)
+
         self.master.config(menu=self.menu_bar)
 
     def update_image(self):
@@ -93,6 +104,7 @@ class Application(tk.Frame):
     
         # Get the latest frame and convert image format
         self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
+        self.image2 = cv2.resize(self.image2, (int(self.image2.shape[1] * 25 / 100), int(self.image2.shape[0] * 25 / 100)))
         self.image2 = Image.fromarray(self.image2) # to PIL format
         self.image2 = ImageTk.PhotoImage(self.image2) # to ImageTk format
  
