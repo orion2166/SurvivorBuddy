@@ -2,16 +2,16 @@ import cv2
 import threading
 
 class camThread(threading.Thread):
-    def __init__(self, previewName, camID):
+    def __init__(self, previewName, camID, cam):
         threading.Thread.__init__(self)
         self.previewName = previewName
         self.camID = camID
+        self.cam = cam
     def run(self):
-        camPreview(self.previewName, self.camID)
+        camPreview(self.previewName, self.cam)
 
-def camPreview(previewName, camID):
+def camPreview(previewName, cam):
     cv2.namedWindow(previewName)
-    cam = cv2.VideoCapture(camID)
     if cam.isOpened():  # try to get the first frame
         rval, frame = cam.read()
     else:

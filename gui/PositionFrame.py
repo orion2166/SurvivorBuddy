@@ -3,6 +3,7 @@
 import tkinter as tk
 import tkinter.ttk as ttk
 import matplotlib.pyplot as plt
+from ControlButtons import ControlButtons
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib as mpl
 from mpl_toolkits.mplot3d import Axes3D
@@ -341,7 +342,7 @@ class RenderDiagram(tk.Frame):
 class PositionFrame(tk.Frame):
     '''Creates the Render and Control Sliders in the GUI'''
 
-    def __init__(self, master, arm_controller, _logFile, **kwargs):
+    def __init__(self, master, arm_controller, notifications, _logFile, **kwargs):
         '''
         Constructor for PositionFrame
         
@@ -355,6 +356,8 @@ class PositionFrame(tk.Frame):
         
         self.serial_arm_controller = arm_controller
         
+        self.notifications_frame = notifications
+
         self.logFile = _logFile
 
         self.render_frame = tk.Frame(self)
@@ -406,7 +409,6 @@ class PositionFrame(tk.Frame):
             master, text="Roll: ", from_=0, to=90, axis=2, dev=self.serial_arm_controller)
         self.roll_control.pack()
 
-
     def create_updater(self):
         '''Starts updater function to update GUI based on current position'''
 
@@ -418,7 +420,7 @@ class PositionFrame(tk.Frame):
             self.yaw_queue,
             self.pitch_queue,
             self.roll_queue,
-            self._master.notifications_frame
+            self.notifications_frame
         )
         self.update_thread.setDaemon(True)
         self.update_thread.start()
