@@ -111,12 +111,15 @@ class Audio():
                         dtype=sd.default.dtype, latency=sd.default.latency,
                         channels=sd.default.channels, callback=self.callback):
                 print('#' * 80, flush=True)
+                runningResponderComs = True
                 # while True:
                 #     if (self.stop_responderComs):
                 #         break
                 input()
+                runningResponderComs = False
                 print("responderComs Stopped", flush=True)
-                
+        return runningResponderComs
+        
 
 
     def survivorComs(self):
