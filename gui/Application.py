@@ -8,7 +8,6 @@ from NotificationsFrame import NotificationFrame
 from StatusBar import StatusBar
 from SerialArmController import SerialArmController
 from CamThread import camThread
-from CamThread import responderCamThread
 from datetime import datetime   #For log file formatting
 from PIL import Image, ImageTk
 from Audio import Audio
@@ -58,9 +57,7 @@ class Application(tk.Frame):
         self.cam = cv2.VideoCapture(1)
 
         self.thread1 = camThread("Survivor Cam", 1, self.cam)
-        #self.thread2 = responderCamThread("Responder Cam", 1, "Responder Cam Copy")
         self.thread1.start()
-        #self.thread2.start()
 
         self.vid = cv2.VideoCapture(0)
         
