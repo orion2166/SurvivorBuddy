@@ -154,6 +154,33 @@ void nod(){
 }
 /*******************************************************************/
 /*Turn Table Motor Functions*/
+void setYaw(int val) {
+//  int offset = 0;
+  int currPos = getPositionTabletop();
+  if (val > currPos) {
+    tabletopServo.writeMicroseconds(1555);
+    while (val > currPos + 10) {
+      currPos = getPositionTabletop();
+    }
+    tabletopServo.writeMicroseconds(1540);
+    while (val > currPos+2) {
+      currPos = getPositionTabletop();
+    }
+  }
+  else if (val < currPos) {
+
+    tabletopServo.writeMicroseconds(1430);
+    while (val < currPos - 10) {
+      currPos = getPositionTabletop();
+    }
+    tabletopServo.writeMicroseconds(1440);
+    while (val < currPos-2) {
+      currPos = getPositionTabletop();
+    }
+  }
+  tabletopServo.writeMicroseconds(1500);
+}
+
 void shake(){
   int currPos = getPositionTabletop();
   for(int i = 0; i < 3; i++){
@@ -163,6 +190,14 @@ void shake(){
     delay(100);
   }
   setYaw(currPos);
+}
+
+void sendPosition() {
+  char pos[3]; // [pitch, yaw, roll]
+  pos[0] = map(leftBaseServo.read(), LEFT_BASE_DOWN, LEFT_BASE_UP, 0, 90);
+  pos[1] = map(getPositionTabletop(), 0, 180, 0, 180); //[REDUNDANT]
+  pos[2] = map(phoneMountServo.read(), PHONEMOUNT_LANDSCAPE-PHONEMOUNT_MAX_TILT, PHONEMOUNT_LANDSCAPE+PHONEMOUNT_MAX_TILT, 0, 90);
+  Serial.write(pos, 3);
 }
 
 void _shutdown() {
@@ -191,48 +226,12 @@ void emergencyShutdown(){
 
 void setPitch(char val) {
   int leftVal = map(val, 0, 90, LEFT_BASE_DOWN, LEFT_BASE_UP);
-  //int rightVal = map(val, 0, 90, RIGHT_BASE_DOWN, RIGHT_BASE_UP);
   leftBaseServo.write(leftVal, 40);
-}
-
-void setYaw(int val) {
-//  int offset = 0;
-  int currPos = getPositionTabletop();
-  if (val > currPos) {
-    tabletopServo.writeMicroseconds(1555);
-    while (val > currPos + 10) {
-      currPos = getPositionTabletop();
-    }
-    tabletopServo.writeMicroseconds(1540);
-    while (val > currPos+2) {
-      currPos = getPositionTabletop();
-    }
-  }
-  else if (val < currPos) {
-
-    tabletopServo.writeMicroseconds(1430);
-    while (val < currPos - 10) {
-      currPos = getPositionTabletop();
-    }
-    tabletopServo.writeMicroseconds(1440);
-    while (val < currPos-2) {
-      currPos = getPositionTabletop();
-    }
-  }
-  tabletopServo.writeMicroseconds(1500);
 }
 
 void setRoll(char val) {
   int pos = map(val, 0, 90, PHONEMOUNT_LANDSCAPE - PHONEMOUNT_MAX_TILT, PHONEMOUNT_LANDSCAPE + PHONEMOUNT_MAX_TILT);
   phoneMountServo.write(pos, 40, true);
-}
-
-void sendPosition() {
-  char pos[3]; // [pitch, yaw, roll]
-  pos[0] = map(leftBaseServo.read(), LEFT_BASE_DOWN, LEFT_BASE_UP, 0, 90);
-  pos[1] = map(getPositionTabletop(), 0, 180, 0, 180); //[REDUNDANT]
-  pos[2] = map(phoneMountServo.read(), PHONEMOUNT_LANDSCAPE-PHONEMOUNT_MAX_TILT, PHONEMOUNT_LANDSCAPE+PHONEMOUNT_MAX_TILT, 0, 90);
-  Serial.write(pos, 3);
 }
 
 void test() {

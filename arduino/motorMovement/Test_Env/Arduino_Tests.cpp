@@ -28,19 +28,17 @@ int test_setRoll(int x){
 
 int test_setPitch(int x){
   //test
-  int expected1 = map(x, 0, 90, 150, 65);
-  int expected2 = map(x, 0, 90, 55, 138);
+  int expected = map(x, 0, 90, 150, 65);
   setPitch(x);
-  int actual1 = setPitchLeft_tester();
-  int actual2 = setPitchRight_tester();
+  int actual = setPitchLeft_tester();
 
   //assert
-  if ((actual1 == expected1) and (actual2 == expected2)) {
+  if (actual == expected) {
     std::cout << "setPitch Passed" << endl;
     return 1;
   }
   else {
-    std::cout << "setPitch Failed - Expected: " << expected1 << " Actual: " << actual1 <<  endl;
+    std::cout << "setPitch Failed - Expected: " << expected << " Actual: " << actual <<  endl;
     return 0;
   }
 }

@@ -16,9 +16,7 @@ int OUTPUT = 1;
 //Control and Feedback Pins
 //regular 180 servos
 int leftBasePin = 9;
-int rightBasePin = 10;
 int leftBaseFeedback = A0;
-int rightBaseFeedback = A1;
 
 //360 servo
 int turnTablePin = 3;
@@ -31,28 +29,24 @@ int phoneMountFeedback = A4;
 int ledPin = 2;
 
 // Position constants
-const int RIGHT_BASE_DOWN = 55;
-const int RIGHT_BASE_UP = 138;
-const int LEFT_BASE_DOWN = 150;
-const int LEFT_BASE_UP = 65;
-const int PHONEMOUNT_LANDSCAPE = 7;
-const int PHONEMOUNT_PORTRAIT = 115;
-const int PHONEMOUNT_TILT = 60;
+const int LEFT_BASE_DOWN = 110; //GOOD LW
+const int LEFT_BASE_UP = 40; //GOOD LW
+const int PHONEMOUNT_LANDSCAPE = 98;
+const int PHONEMOUNT_MAX_TILT = 20; //NEED CONSTANT LW
+const int TABLETOP_OFFSET = 65; //GOOD LW
+const int TABLETOP_FRONT = 90; //GOOD LW
+const int TABLETOP_LEFT = 180+TABLETOP_OFFSET; //GOOD LW
+const int TABLETOP_RIGHT = 0+TABLETOP_OFFSET; //GOOD LW
 
 // Feedback constants
-const int RIGHT_BASE_FB_DOWN = 186;
-const int RIGHT_BASE_FB_UP = 369;
-const int LEFT_BASE_FB_DOWN = 415;
-const int LEFT_BASE_FB_UP = 235;
-const int PHONEMOUNT_FB_PORTRAIT = 0;
-const int PHONEMOUNT_FB_LANDSCAPE = 0;
-const int TABLETOP_FRONT = 120;
-const int TABLETOP_LEFT = 205;
-const int TABLETOP_RIGHT = 25;
+const int LEFT_BASE_FB_DOWN = 415; //NEED CONSTANT LW
+const int LEFT_BASE_FB_UP = 235; //NEED CONSTANT LW
+const int PHONEMOUNT_FB_PORTRAIT = 0; //REDUNDANT LW
+const int PHONEMOUNT_FB_LANDSCAPE = 0; //NEED CONSTANT LW
+
 
 //Create VarSpeedServo objects
 VarSpeedServo_Mock leftBaseServo;
-VarSpeedServo_Mock rightBaseServo;
 VarSpeedServo_Mock tabletopServo;
 VarSpeedServo_Mock phoneMountServo;
 Serial serial;
@@ -93,24 +87,20 @@ int setPitchLeft_tester() {
   return leftBaseServo.write_2_input;
 }
 
-int setPitchRight_tester() {
-  return rightBaseServo.write_2_input;
-}
-
 /*******************************************************************/
 /*Phone Mount Functions*/
-void portrait(){ //phoneMountServo moves phone to portrait position
-    phoneMountServo.write(PHONEMOUNT_PORTRAIT, 40, true);
-}
-
 void landscape(){ //phoneMountServo moves phone to landscape position
     phoneMountServo.write(PHONEMOUNT_LANDSCAPE, 40, true);
 }
 
 void tilt() {
   int currAngle = phoneMountServo.read();
-  phoneMountServo.write(PHONEMOUNT_TILT, 60, true);
-  delay(500);
+  for(int i =0; i < 3; i++){
+    phoneMountServo.write(PHONEMOUNT_LANDSCAPE+PHONEMOUNT_MAX_TILT, 60, true);
+    delay(500);
+    phoneMountServo.write(PHONEMOUNT_LANDSCAPE-PHONEMOUNT_MAX_TILT, 60, true);
+    delay(500);
+  }
   phoneMountServo.write(currAngle, 60, true);
 }
 
@@ -127,11 +117,9 @@ int getPositionPM(){
  * Get current position of Base Servos
 */
 int getPositionBM(){
-//  int potValLeft = analogRead(leftBaseFeedback);
-//  int leftAngle = map(potValLeft, LEFT_BASE_FB_DOWN, LEFT_BASE_FB_UP, 0, 90);
-  int potValRight = analogRead(rightBaseFeedback);
-  int rightAngle = map(potValRight, RIGHT_BASE_FB_DOWN, RIGHT_BASE_FB_UP, 0, 90);
-  return rightAngle;
+  int potValLeft = analogRead(leftBaseFeedback);
+  int leftAngle = map(potValLeft, LEFT_BASE_FB_DOWN, LEFT_BASE_FB_UP, 0, 90);
+  return leftAngle;
 }
 
 // 360 parallax constants
@@ -162,94 +150,78 @@ int getPositionTabletop(){
   else if (theta > (unitsFC - 1)) {
     theta = unitsFC - 1;
   }
+
+  if(theta < 180){
+      theta = map(theta, TABLETOP_RIGHT, 0, 0, TABLETOP_RIGHT);
+      if( theta < 0){
+        theta = 0;
+      }
+      if( theta > TABLETOP_RIGHT){
+        theta = TABLETOP_RIGHT;
+      }
+  }
+  else if (theta > 180){
+    theta = map(theta, 359, TABLETOP_LEFT, TABLETOP_RIGHT+1, 180);
+    if(theta < TABLETOP_RIGHT +1){
+      theta = TABLETOP_RIGHT +1;
+    }
+    if( theta > 180)
+      theta = 180;
+  }
+
   return theta;
 }
 
 void up(){
   leftBaseServo.write(LEFT_BASE_UP, 40);
-  rightBaseServo.write(RIGHT_BASE_UP, 40);
   leftBaseServo.wait();
-  rightBaseServo.wait();
 }
 void down(){
   leftBaseServo.write(LEFT_BASE_DOWN, 40);
-  rightBaseServo.write(RIGHT_BASE_DOWN, 40);
   leftBaseServo.wait();
-  rightBaseServo.wait();
 }
 void nod(){
   //up down, arm nods twice
   int currAngleLeft = leftBaseServo.read();
-  int currAngleRight = rightBaseServo.read();
   leftBaseServo.write(LEFT_BASE_UP, 60);
-  rightBaseServo.write(RIGHT_BASE_UP, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   delay(100);
   leftBaseServo.write(70, 60);
-  rightBaseServo.write(70, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   delay(100);
   leftBaseServo.write(LEFT_BASE_UP, 60);
-  rightBaseServo.write(RIGHT_BASE_UP, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   delay(100);
   leftBaseServo.write(70, 60);
-  rightBaseServo.write(70, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   delay(100);
   leftBaseServo.write(LEFT_BASE_UP, 60);
-  rightBaseServo.write(RIGHT_BASE_UP, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   leftBaseServo.write(currAngleLeft, 60, true);
-  rightBaseServo.write(currAngleRight, 60, true);
 }
 /*******************************************************************/
 /*Turn Table Motor Functions*/
 void setYaw(int val) {
 //  int offset = 0;
   int currPos = getPositionTabletop();
-//  int diff = currPos - val; /* ATTEMPT AT PID CONTROLLER FAILED */
-//  while (abs(diff) > 1) {
-//    Serial.println("LOOPING");
-//    offset = 0;
-//    if (diff > 200) {
-//      diff = 200;
-//    }
-//    else if (diff < -200) {
-//      diff = -200;
-//    }
-//    if (diff > 1) {
-//      offset = -30;
-//    }
-//    else if (diff < -1) {
-//      offset = 30;
-//    }
-//    tabletopServo.writeMicroseconds(1500 + diff + offset);
-//    currPos = getPositionTabletop();
-//    diff = currPos - val;
-//  }
   if (val > currPos) {
-    tabletopServo.writeMicroseconds(1430);
+    tabletopServo.writeMicroseconds(1555);
     while (val > currPos + 10) {
       currPos = getPositionTabletop();
     }
-    tabletopServo.writeMicroseconds(1440);
-    while (val > currPos) {
+    tabletopServo.writeMicroseconds(1540);
+    while (val > currPos+2) {
       currPos = getPositionTabletop();
     }
   }
   else if (val < currPos) {
-    tabletopServo.writeMicroseconds(1555);
+
+    tabletopServo.writeMicroseconds(1430);
     while (val < currPos - 10) {
       currPos = getPositionTabletop();
     }
-    tabletopServo.writeMicroseconds(1540);
-    while (val < currPos) {
+    tabletopServo.writeMicroseconds(1440);
+    while (val < currPos-2) {
       currPos = getPositionTabletop();
     }
   }
@@ -257,24 +229,27 @@ void setYaw(int val) {
 }
 
 void shake(){
-  setYaw((TABLETOP_LEFT + TABLETOP_FRONT)/2);
-  delay(100);
-  setYaw((TABLETOP_RIGHT + TABLETOP_FRONT)/2);
-  delay(100);
-  setYaw(TABLETOP_FRONT);
+  int currPos = getPositionTabletop();
+  for(int i = 0; i < 3; i++){
+    setYaw(45);
+    delay(100);
+    setYaw(45+90);
+    delay(100);
+  }
+  setYaw(currPos);
 }
 
 void sendPosition() {
   char pos[3]; // [pitch, yaw, roll]
-  pos[0] = map(rightBaseServo.read(), RIGHT_BASE_DOWN, RIGHT_BASE_UP, 0, 90);
-  pos[1] = map(getPositionTabletop(), TABLETOP_LEFT, TABLETOP_RIGHT, 0, 180);
-  pos[2] = map(phoneMountServo.read(), PHONEMOUNT_PORTRAIT, PHONEMOUNT_LANDSCAPE, 0, 90);
+  pos[0] = map(leftBaseServo.read(), LEFT_BASE_DOWN, LEFT_BASE_UP, 0, 90);
+  pos[1] = map(getPositionTabletop(), 0, 180, 0, 180); //[REDUNDANT]
+  pos[2] = map(phoneMountServo.read(), PHONEMOUNT_LANDSCAPE-PHONEMOUNT_MAX_TILT, PHONEMOUNT_LANDSCAPE+PHONEMOUNT_MAX_TILT, 0, 90);
   serial.write(pos, 3);
 }
 
 void _shutdown() {
   setYaw(TABLETOP_FRONT);
-  portrait();
+  landscape();
   delay(100);
   down();
   delay(100);
@@ -298,13 +273,11 @@ void emergencyShutdown(){
 
 void setPitch(char val) {
   int leftVal = map(val, 0, 90, LEFT_BASE_DOWN, LEFT_BASE_UP);
-  int rightVal = map(val, 0, 90, RIGHT_BASE_DOWN, RIGHT_BASE_UP);
   leftBaseServo.write(leftVal, 40);
-  rightBaseServo.write(rightVal, 40);
 }
 
 void setRoll(char val) {
-  int pos = map(val, 0, 90, PHONEMOUNT_PORTRAIT, PHONEMOUNT_LANDSCAPE);
+  int pos = map(val, 0, 90, PHONEMOUNT_LANDSCAPE - PHONEMOUNT_MAX_TILT, PHONEMOUNT_LANDSCAPE + PHONEMOUNT_MAX_TILT);
   phoneMountServo.write(pos, 40, true);
 }
 
@@ -323,7 +296,6 @@ void setup() {
 
   // feedback pins
   pinMode(leftBaseFeedback, INPUT);
-  pinMode(rightBaseFeedback, INPUT);
   pinMode(turnTableFeedback, INPUT);
   pinMode(phoneMountFeedback, INPUT);
 
@@ -332,11 +304,8 @@ void setup() {
   setYaw(TABLETOP_FRONT);
   leftBaseServo.attach(leftBasePin);
   leftBaseServo.write(LEFT_BASE_DOWN, 60, true);
-  rightBaseServo.attach(rightBasePin);
-  rightBaseServo.write(RIGHT_BASE_DOWN, 60, true);
-//  rightBaseServo.write(RIGHT_BASE_UP, 60, true);
   phoneMountServo.attach(phoneMountPin);
-  phoneMountServo.write(PHONEMOUNT_PORTRAIT);
+  phoneMountServo.write(PHONEMOUNT_LANDSCAPE);
 }
 
 //Serial Data
@@ -360,7 +329,7 @@ void loop() {
     }
     else if (serialData[0] == 0x01) { // set yaw
       if (0 <= serialData[1] && serialData[1] <= 180) {
-        lastYaw = map(serialData[1], 0, 180, TABLETOP_LEFT, TABLETOP_RIGHT);
+        lastYaw = map(serialData[1], 0, 180, 0, 180); //#####REDUNDANT#####
         setYaw(lastYaw);
       }
     }
@@ -374,9 +343,6 @@ void loop() {
     }
     else if (serialData[0] == 0x04){ // open
       up();
-    }
-    else if(serialData[0] == 0x05){ // portrait
-      portrait();
     }
     else if (serialData[0] == 0x06){ // landscape
       landscape();
@@ -403,3 +369,10 @@ void loop() {
 
   delay(10);
 } //end loop
+
+//void loop() {
+//  //setYaw(0);
+//  Serial.print(" ");
+//  Serial.print(getPositionTabletop());
+//  delay(2000);
+//}
