@@ -2,10 +2,8 @@
 
 //Control and Feedback Pins
 //regular 180 servos
-int leftBasePin = 9; 
-int rightBasePin = 10; 
-int leftBaseFeedback = A0; 
-int rightBaseFeedback = A1; 
+int leftBasePin = 9;
+int leftBaseFeedback = A0;
 
 //360 servo
 int turnTablePin = 3;
@@ -18,8 +16,6 @@ int phoneMountFeedback = A4;
 int ledPin = 2;
 
 // Position constants
-const int RIGHT_BASE_DOWN = 55; //REDUNDANT LW
-const int RIGHT_BASE_UP = 138; //REDUNDANT LW
 const int LEFT_BASE_DOWN = 110; //GOOD LW
 const int LEFT_BASE_UP = 40; //GOOD LW
 const int PHONEMOUNT_LANDSCAPE = 98;
@@ -30,29 +26,22 @@ const int TABLETOP_LEFT = 180+TABLETOP_OFFSET; //GOOD LW
 const int TABLETOP_RIGHT = 0+TABLETOP_OFFSET; //GOOD LW
 
 // Feedback constants
-const int RIGHT_BASE_FB_DOWN = 186; //NEED CONSTANT LW
-const int RIGHT_BASE_FB_UP = 369; //NEED CONSTANT LW
 const int LEFT_BASE_FB_DOWN = 415; //NEED CONSTANT LW
 const int LEFT_BASE_FB_UP = 235; //NEED CONSTANT LW
 const int PHONEMOUNT_FB_PORTRAIT = 0; //REDUNDANT LW
 const int PHONEMOUNT_FB_LANDSCAPE = 0; //NEED CONSTANT LW
 
 
-//Create VarSpeedServo objects 
+//Create VarSpeedServo objects
 VarSpeedServo leftBaseServo;
-VarSpeedServo rightBaseServo;
 VarSpeedServo tabletopServo;
 VarSpeedServo phoneMountServo;
 
-enum Command {PITCH, YAW, ROLL, CLOSE, OPEN, PORTRAIT, 
+enum Command {PITCH, YAW, ROLL, CLOSE, OPEN, PORTRAIT,
               LANDSCAPE, NOD, SHAKE, TILT, SHUTDOWN};
 
 /*******************************************************************/
 /*Phone Mount Functions*/
-//void portrait(){ //phoneMountServo moves phone to portrait position
-//    phoneMountServo.write(PHONEMOUNT_PORTRAIT, 40, true);
-//}
-
 void landscape(){ //phoneMountServo moves phone to landscape position
     phoneMountServo.write(PHONEMOUNT_LANDSCAPE, 40, true);
 }
@@ -81,11 +70,9 @@ int getPositionPM(){
  * Get current position of Base Servos
 */
 int getPositionBM(){
-//  int potValLeft = analogRead(leftBaseFeedback);
-//  int leftAngle = map(potValLeft, LEFT_BASE_FB_DOWN, LEFT_BASE_FB_UP, 0, 90);
-  int potValRight = analogRead(rightBaseFeedback);
-  int rightAngle = map(potValRight, RIGHT_BASE_FB_DOWN, RIGHT_BASE_FB_UP, 0, 90);
-  return rightAngle;
+  int potValLeft = analogRead(leftBaseFeedback);
+  int leftAngle = map(potValLeft, LEFT_BASE_FB_DOWN, LEFT_BASE_FB_UP, 0, 90);
+  return leftAngle;
 }
 
 // 360 parallax constants
@@ -116,7 +103,7 @@ int getPositionTabletop(){
   else if (theta > (unitsFC - 1)) {
     theta = unitsFC - 1;
   }
-  
+
   if(theta < 180){
       theta = map(theta, TABLETOP_RIGHT, 0, 0, TABLETOP_RIGHT);
       if( theta < 0){
@@ -134,52 +121,36 @@ int getPositionTabletop(){
     if( theta > 180)
       theta = 180;
   }
-  
+
   return theta;
 }
 
 void up(){
   leftBaseServo.write(LEFT_BASE_UP, 40);
-  rightBaseServo.write(RIGHT_BASE_UP, 40);
   leftBaseServo.wait();
-  rightBaseServo.wait();
 }
 void down(){
   leftBaseServo.write(LEFT_BASE_DOWN, 40);
-  rightBaseServo.write(RIGHT_BASE_DOWN, 40);
   leftBaseServo.wait();
-  rightBaseServo.wait();
 }
 void nod(){
   //up down, arm nods twice
   int currAngleLeft = leftBaseServo.read();
-  int currAngleRight = rightBaseServo.read();
   leftBaseServo.write(LEFT_BASE_UP, 60);
-  rightBaseServo.write(RIGHT_BASE_UP, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   delay(100);
   leftBaseServo.write(70, 60);
-  rightBaseServo.write(70, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   delay(100);
   leftBaseServo.write(LEFT_BASE_UP, 60);
-  rightBaseServo.write(RIGHT_BASE_UP, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   delay(100);
   leftBaseServo.write(70, 60);
-  rightBaseServo.write(70, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   delay(100);
   leftBaseServo.write(LEFT_BASE_UP, 60);
-  rightBaseServo.write(RIGHT_BASE_UP, 60);
   leftBaseServo.wait();
-  rightBaseServo.wait();
   leftBaseServo.write(currAngleLeft, 60, true);
-  rightBaseServo.write(currAngleRight, 60, true);
 }
 /*******************************************************************/
 /*Turn Table Motor Functions*/
@@ -220,9 +191,8 @@ void emergencyShutdown(){
 
 void setPitch(char val) {
   int leftVal = map(val, 0, 90, LEFT_BASE_DOWN, LEFT_BASE_UP);
-  int rightVal = map(val, 0, 90, RIGHT_BASE_DOWN, RIGHT_BASE_UP);
+  //int rightVal = map(val, 0, 90, RIGHT_BASE_DOWN, RIGHT_BASE_UP);
   leftBaseServo.write(leftVal, 40);
-  rightBaseServo.write(rightVal, 40);
 }
 
 void setYaw(int val) {
@@ -239,7 +209,7 @@ void setYaw(int val) {
     }
   }
   else if (val < currPos) {
-    
+
     tabletopServo.writeMicroseconds(1430);
     while (val < currPos - 10) {
       currPos = getPositionTabletop();
@@ -280,16 +250,14 @@ void setup() {
 
   // feedback pins
   pinMode(leftBaseFeedback, INPUT);
-  pinMode(rightBaseFeedback, INPUT);
   pinMode(turnTableFeedback, INPUT);
   pinMode(phoneMountFeedback, INPUT);
-  
+
   // attaches the servo on pin to the servo object
   tabletopServo.attach(turnTablePin);
   setYaw(TABLETOP_FRONT);
-  leftBaseServo.attach(leftBasePin);  
+  leftBaseServo.attach(leftBasePin);
   leftBaseServo.write(LEFT_BASE_DOWN, 60, true);
-  rightBaseServo.attach(rightBasePin);
   phoneMountServo.attach(phoneMountPin);
   phoneMountServo.write(PHONEMOUNT_LANDSCAPE);
 }
@@ -304,10 +272,10 @@ void loop() {
 //  setYaw(lastYaw);
 //  tabletopServo.writeMicroseconds(1510);
 //  test();
-  
+
   numLoops++;
-  if (Serial.available() > 0) {//serial is reading stuff 
-    Serial.readBytes(serialData, 2); 
+  if (Serial.available() > 0) {//serial is reading stuff
+    Serial.readBytes(serialData, 2);
     if (serialData[0] == 0x00) { // set pitch
       if (0 <= serialData[1] && serialData[1] <= 90) {
         setPitch(serialData[1]);
@@ -324,18 +292,15 @@ void loop() {
         setRoll(serialData[1]);
       }
     }
-    else if(serialData[0] == 0x03){ // close 
+    else if(serialData[0] == 0x03){ // close
       down();
     }
     else if (serialData[0] == 0x04){ // open
       up();
     }
-//    else if(serialData[0] == 0x05){ // portrait
-//      portrait();
-//    }
     else if (serialData[0] == 0x06){ // landscape
       landscape();
-    } 
+    }
     else if(serialData[0] == 0x07){ // nod
       nod();
     }
@@ -355,7 +320,7 @@ void loop() {
     sendPosition();
     numLoops = 0;
   }
-  
+
   delay(10);
 } //end loop
 
