@@ -8,7 +8,7 @@ class VarSpeedServo_Mock {
       std::cout << "waiting" << std::endl;
     }
     int read(){
-      return 10;
+      return write_2_input;
     }
     void write(int x, int y) {
       write_2_input = x;
