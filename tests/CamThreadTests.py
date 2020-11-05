@@ -7,6 +7,10 @@ from CamThread import camPreview
 from CamThread import camThread
 
 class TestCamThreadMethods(unittest.TestCase):
+    def test_camThread():
+        
+        
+        
     def test_camPreview(self):
         cam = Mock()
         test = camThread("Survivor Cam", 1, cam)
