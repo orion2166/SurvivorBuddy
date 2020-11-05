@@ -64,22 +64,22 @@ class Audio():
         return newList
 
     def setSurvivorSpeaker(self, survivorSpeaker):
-        print("set survivorSpeaker with "+str(survivorSpeaker), flush=True)
+        #print("set survivorSpeaker with "+str(survivorSpeaker), flush=True)
         self.survivorSpeaker = survivorSpeaker
         self.checkResponderComsReady()
 
     def setSurvivorMic(self, survivorMic):
-        print("set survivorMic with "+str(survivorMic), flush=True)
+        #print("set survivorMic with "+str(survivorMic), flush=True)
         self.survivorMic = survivorMic
         self.checkSurvivorComsReady()
 
     def setResponderSpeaker(self, responderSpeaker):
-        print("set responderSpeaker with "+str(responderSpeaker), flush=True)
+        #print("set responderSpeaker with "+str(responderSpeaker), flush=True)
         self.responderSpeaker = responderSpeaker
         self.checkSurvivorComsReady()
 
     def setResponderMic(self, responderMic):
-        print("set responderMic with "+str(responderMic), flush=True)
+        #print("set responderMic with "+str(responderMic), flush=True)
         self.responderMic = responderMic
         self.checkResponderComsReady()
 
@@ -104,39 +104,40 @@ class Audio():
 
     def responderComs(self):
         self.stop_responderComs = False
-        print("responder coms started", flush=True)
+        #print("responder coms started", flush=True)
         sd.default.device = [self.responderMic,self.survivorSpeaker] #input/output   Microphone Array (Realtek High / Headphones (Realtek High Defin
         with sd.Stream(device=(sd.default.device),
                         samplerate=sd.default.samplerate, blocksize=sd.default.blocksize,
                         dtype=sd.default.dtype, latency=sd.default.latency,
                         channels=sd.default.channels, callback=self.callback):
-                print('#' * 80, flush=True)
+                #print('#' * 80, flush=True)
                 runningResponderComs = True
                 # while True:
                 #     if (self.stop_responderComs):
                 #         break
-                input()
+                self.pauseUntilUserInput()#input()
                 runningResponderComs = False
-                print("responderComs Stopped", flush=True)
+                #print("responderComs Stopped", flush=True)
         return runningResponderComs
         
-
+    def pauseUntilUserInput(self):
+        return input()
 
     def survivorComs(self):
         self.stop_survivorComs = False
-        print('#' * 80, flush=True)
-        print("survivor coms started", flush=True)
+        #print('#' * 80, flush=True)
+        #print("survivor coms started", flush=True)
         sd.default.device = [self.survivorMic,self.responderSpeaker] #input/output    Microphone (HD Pro Webcam C920)/Headset Earphone (Razer Audio C
         with sd.Stream(device=(sd.default.device),
                         samplerate=sd.default.samplerate, blocksize=sd.default.blocksize,
                         dtype=sd.default.dtype, latency=sd.default.latency,
                         channels=sd.default.channels, callback=self.callback):
-                print('#' * 80, flush=True)
+                #print('#' * 80, flush=True)
                 # while True:
                 #     if (self.stop_survivorComs):
                 #         break
-                input()
-                print("survivorComs Stopped", flush=True)
+                self.pauseUntilUserInput()#input()
+                #print("survivorComs Stopped", flush=True)
 
 
 # audio = Audio()
