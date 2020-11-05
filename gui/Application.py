@@ -63,6 +63,8 @@ class Application(tk.Frame):
         
         self.create_widgets(self.vid, self.cam)
 
+        self.hello()
+
     def create_widgets(self, vid, cam):
         '''Creates the widgets seen in the GUI'''
 
@@ -227,8 +229,7 @@ class Application(tk.Frame):
         
         Simply prints "Hello from Menu" to the console and the NotificationsFrame
         '''
-        print("Hello from Menu")
-        self.notifications_frame.append_line("Hello from Menu")
+        return True
         
         
 
