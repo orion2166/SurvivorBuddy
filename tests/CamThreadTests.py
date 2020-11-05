@@ -22,7 +22,6 @@ class TestCamThreadMethods(unittest.TestCase):
 		self.previewName = "test"
 		self.cam = cv2.VideoCapture(0)
 		self.rval, self.frame = self.cam.read()
-		self.camPreview = camPreview(self.previewName, self.cam)
 
 		print("Real Output:")
 		print("cam.read() return value returned:",end='')
@@ -47,7 +46,6 @@ class TestCamThreadMethods(unittest.TestCase):
 		self.previewName = "test"
 		self.cam = cv2.VideoCapture(0)
 		self.rval, self.frame = self.cam.read()
-		self.camPreview = camPreview(self.previewName, self.cam)
 
 		print("Real Output:")
 		print("cam.read() returned:",end='')
@@ -66,12 +64,11 @@ class TestCamThreadMethods(unittest.TestCase):
 		print("Test camPreview Utility Function Displaying Live Video Stream On Survivor GUI")
 		print("IDEF0: 6.1")
 		print("Input: Preview Name, Video Stream from Camera")
-		print("Expected Output: cam.read() == true, tuple containing stream data, imshow() == None")
+		print("Expected Output: imshow() == None")
 		
 		self.previewName = "test"
 		self.cam = cv2.VideoCapture(0)
 		self.rval, self.frame = self.cam.read()
-		self.camPreview = camPreview(self.previewName, self.cam)
 
 		print("Real Output:")
 		print("imshow() returned:",end='')
