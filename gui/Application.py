@@ -22,13 +22,11 @@ class Application(tk.Frame):
     def __init__(self, master, **kwargs):
         '''
         The constructor for the Application class
-
         :param master: the Tk parent widget
         '''
-        self.audio = Audio()
-
         super().__init__(master, **kwargs)
         self.pack()
+        self.audio = Audio()
         self.taskbar_icon = tk.PhotoImage(file="SBLogo.png")
         self.master.call('wm', 'iconphoto', self.master._w, self.taskbar_icon)
         self.config(padx=16, pady=16)
@@ -54,24 +52,23 @@ class Application(tk.Frame):
         self.notifications_frame = NotificationFrame(self.bottom, self.logFile)
 
         self.serial_arm_controller = SerialArmController(self.status_bar, self.notifications_frame)
-
-        self.cam = cv2.VideoCapture(1)
-
-        self.thread1 = camThread("Survivor Cam", 1, self.cam)
-        self.thread1.start()
-
-        self.vid = cv2.VideoCapture(0)
         
-        self.create_widgets(self.vid, self.cam)
+        self.create_widgets()
 
         self.hello()
-        
 
-    def create_widgets(self, vid, cam):
+    def create_widgets(self):
         '''Creates the widgets seen in the GUI'''
 
         self.menu_bar = tk.Menu(self)
         self.create_menu(self.menu_bar)
+
+        self.vid = cv2.VideoCapture(0)
+        self.cam = cv2.VideoCapture(1)
+        self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
+        self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
 
         self.canvas = tk.Canvas(self.left, width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.canvas.pack()
@@ -80,9 +77,6 @@ class Application(tk.Frame):
         self.canvas2.pack(side="left", expand=0)
 
         self.notifications_frame.pack(side="left", fill="x", expand=1)
-
-        self.interval = 10
-        self.update_image()
 
         self.position_frame = PositionFrame(self.right, self.serial_arm_controller, self.notifications_frame, self.logFile)
         self.position_frame.pack(side="top", expand=0)
@@ -94,6 +88,11 @@ class Application(tk.Frame):
 
         self.master.config(menu=self.menu_bar)
 
+        self.thread1 = camThread("Survivor Cam", 1, self.cam)
+        self.thread1.start()
+
+        self.update_image()
+
     def update_image(self):
         # Get the latest frame and convert image format
         self.image = cv2.cvtColor(self.vid.read()[1], cv2.COLOR_BGR2RGB) # to RGB
@@ -102,18 +101,17 @@ class Application(tk.Frame):
  
         # Update image
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.image)
-    
-        # Get the latest frame and convert image format
-        self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
-        self.image2 = cv2.resize(self.image2, (int(self.image2.shape[1] * 25 / 100), int(self.image2.shape[0] * 25 / 100)))
-        self.image2 = Image.fromarray(self.image2) # to PIL format
-        self.image2 = ImageTk.PhotoImage(self.image2) # to ImageTk format
- 
-        # Update image
-        self.canvas2.create_image(0, 0, anchor=tk.NW, image=self.image2)
+        if(self.cam.isOpened()):
+            # Get the latest frame and convert image format
+            self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
+            self.image2 = cv2.resize(self.image2, (int(self.image2.shape[1] * 25 / 100), int(self.image2.shape[0] * 25 / 100)))
+            self.image2 = Image.fromarray(self.image2) # to PIL format
+            self.image2 = ImageTk.PhotoImage(self.image2) # to ImageTk format
+            # Update image
+            self.canvas2.create_image(0, 0, anchor=tk.NW, image=self.image2)
 
         # Repeat every 'interval' ms
-        self.after(self.interval, self.update_image)
+        self.after(20, self.update_image)
 
     def close_app(self):    #Had to make new quit function to close file
         '''Closes the GUI application'''
