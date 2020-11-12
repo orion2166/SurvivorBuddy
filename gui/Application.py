@@ -63,8 +63,11 @@ class Application(tk.Frame):
         self.menu_bar = tk.Menu(self)
         self.create_menu(self.menu_bar)
 
-        self.vid = cv2.VideoCapture(0)
-        self.cam = cv2.VideoCapture(1)
+        cam0 = 0
+        cam1 = 1
+
+        self.vid = cv2.VideoCapture(cam0)
+        self.cam = cv2.VideoCapture(cam1)
         self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
         self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -88,7 +91,7 @@ class Application(tk.Frame):
 
         self.master.config(menu=self.menu_bar)
 
-        self.thread1 = camThread("Survivor Cam", 1, self.cam)
+        self.thread1 = camThread("Survivor Cam", cam1, self.cam)
         self.thread1.start()
 
         self.update_image()
@@ -98,9 +101,9 @@ class Application(tk.Frame):
         self.image = cv2.cvtColor(self.vid.read()[1], cv2.COLOR_BGR2RGB) # to RGB
         self.image = Image.fromarray(self.image) # to PIL format
         self.image = ImageTk.PhotoImage(self.image) # to ImageTk format
- 
         # Update image
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.image)
+
         if(self.cam.isOpened()):
             # Get the latest frame and convert image format
             self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
