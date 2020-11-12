@@ -14,6 +14,8 @@ from Audio import Audio
 import os.path
 import webbrowser
 import cv2
+import time
+from threading import Thread
 
 
 class Application(tk.Frame):
@@ -31,6 +33,9 @@ class Application(tk.Frame):
         self.master.call('wm', 'iconphoto', self.master._w, self.taskbar_icon)
         self.config(padx=16, pady=16)
         
+        self.cam0 = 0
+        self.cam1 = 1
+
         now = datetime.now()    #Create unique logfile for notifications and errors
         timestamp = now.strftime("%m_%d_%Y_%H_%M_%S")
         file_name = 'LOGFILE_' + timestamp +'.txt'        
@@ -63,11 +68,8 @@ class Application(tk.Frame):
         self.menu_bar = tk.Menu(self)
         self.create_menu(self.menu_bar)
 
-        cam0 = 0
-        cam1 = 1
-
-        self.vid = cv2.VideoCapture(cam0)
-        self.cam = cv2.VideoCapture(cam1)
+        self.vid = cv2.VideoCapture(self.cam0)
+        self.cam = cv2.VideoCapture(self.cam1)
         self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
         self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
         self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -91,7 +93,7 @@ class Application(tk.Frame):
 
         self.master.config(menu=self.menu_bar)
 
-        self.thread1 = camThread("Survivor Cam", cam1, self.cam)
+        self.thread1 = camThread("Survivor Cam", self.cam1, self.cam)
         self.thread1.start()
 
         self.update_image()
@@ -140,8 +142,8 @@ class Application(tk.Frame):
         # Device Menu
         self.device_menu = tk.Menu(root_menu, tearoff=0)
         self.device_menu.add_command(label="Refresh Devices", command=self.refresh_devices)
+        self.device_menu.add_command(label="Swap Cameras", command=self.swap_cams)
         self.device_menu.add_separator()
-        
         root_menu.add_cascade(label="Device", menu=self.device_menu)
         
         #Survivor mic menu
@@ -184,6 +186,17 @@ class Application(tk.Frame):
         self.help_menu.add_command(label="User Manual", command=self.open_user_manual)
         self.help_menu.add_command(label="Programmer's Reference", command=self.open_programmer_reference)
         root_menu.add_cascade(label="Help", menu=self.help_menu)
+
+    def swap_cams(self):
+        self.cam0, self.cam1 = self.cam1, self.cam0
+
+        self.vid = cv2.VideoCapture(self.cam0)
+        self.cam = cv2.VideoCapture(self.cam1)
+
+        self.thread1.closeCams()
+        self.thread1 = camThread("Survivor Cam", self.cam1, self.cam)
+        self.thread1.start()
+
 
     def refresh_devices(self):
         '''Refreshes the Devices menu'''
