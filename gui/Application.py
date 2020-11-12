@@ -50,13 +50,9 @@ class Application(tk.Frame):
         
         self.create_widgets()
 
-<<<<<<< Updated upstream
-    def create_widgets(self, vid, cam):
-=======
         self.hello()
 
     def create_widgets(self):
->>>>>>> Stashed changes
         '''Creates the widgets seen in the GUI'''
 
         self.menu_bar = tk.Menu(self)
@@ -101,13 +97,13 @@ class Application(tk.Frame):
         # Update image
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.image)
         if(self.cam.isOpened()):
-	        # Get the latest frame and convert image format
-	        self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
-	        self.image2 = cv2.resize(self.image2, (int(self.image2.shape[1] * 25 / 100), int(self.image2.shape[0] * 25 / 100)))
-	        self.image2 = Image.fromarray(self.image2) # to PIL format
-	        self.image2 = ImageTk.PhotoImage(self.image2) # to ImageTk format
-	        # Update image
-	        self.canvas2.create_image(0, 0, anchor=tk.NW, image=self.image2)
+            # Get the latest frame and convert image format
+            self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
+            self.image2 = cv2.resize(self.image2, (int(self.image2.shape[1] * 25 / 100), int(self.image2.shape[0] * 25 / 100)))
+            self.image2 = Image.fromarray(self.image2) # to PIL format
+            self.image2 = ImageTk.PhotoImage(self.image2) # to ImageTk format
+            # Update image
+            self.canvas2.create_image(0, 0, anchor=tk.NW, image=self.image2)
 
         # Repeat every 'interval' ms
         self.after(20, self.update_image)
@@ -134,9 +130,9 @@ class Application(tk.Frame):
         self.device_menu.add_separator()
         
         root_menu.add_cascade(label="Device", menu=self.device_menu)
-
+        
         #Survivor mic menu
-        self.device_menu = tk.Menu(root_menu, tearoff=0)
+        self.survivorMic_menu = tk.Menu(root_menu, tearoff=0)
         audio = Audio()
         inputDeviceList = audio.createInputDeviceList()
         outputDeviceList = audio.createOutputDeviceList()
@@ -144,30 +140,30 @@ class Application(tk.Frame):
         for key, value in inputDeviceList.items():
             print(key)
             print(value)
-            self.device_menu.add_command(label=key, command=lambda value=value: audio.setSurvivorMic(value))
-        self.device_menu.add_separator()
-        root_menu.add_cascade(label="Mic Survivor", menu=self.device_menu)
+            self.survivorMic_menu.add_command(label=key, command=lambda value=value: audio.setSurvivorMic(value))
+        self.survivorMic_menu.add_separator()
+        root_menu.add_cascade(label="Mic Survivor", menu=self.survivorMic_menu)
 
         #Survivor speaker menu
-        self.device_menu = tk.Menu(root_menu, tearoff=0)
+        self.survivorSpeaker_menu = tk.Menu(root_menu, tearoff=0)
         for key, value in outputDeviceList.items():
-            self.device_menu.add_command(label=key, command=lambda value=value: audio.setSurvivorSpeaker(value))
-        self.device_menu.add_separator()
-        root_menu.add_cascade(label="Speaker Survivor", menu=self.device_menu)
+            self.survivorSpeaker_menu.add_command(label=key, command=lambda value=value: audio.setSurvivorSpeaker(value))
+        self.survivorSpeaker_menu.add_separator()
+        root_menu.add_cascade(label="Speaker Survivor", menu=self.survivorSpeaker_menu)
 
         #Responder mic menu
-        self.device_menu = tk.Menu(root_menu, tearoff=0)
+        self.responderMic_menu = tk.Menu(root_menu, tearoff=0)
         for key, value in inputDeviceList.items():
-            self.device_menu.add_command(label=key, command=lambda value=value: audio.setResponderMic(value))
-        self.device_menu.add_separator()
-        root_menu.add_cascade(label="Mic Responder", menu=self.device_menu)
+            self.responderMic_menu.add_command(label=key, command=lambda value=value: audio.setResponderMic(value))
+        self.responderMic_menu.add_separator()
+        root_menu.add_cascade(label="Mic Responder", menu=self.responderMic_menu)
 
         #Responder speaker menu
-        self.device_menu = tk.Menu(root_menu, tearoff=0)
+        self.responderSpeaker_menu = tk.Menu(root_menu, tearoff=0)
         for key, value in outputDeviceList.items():
-            self.device_menu.add_command(label=key, command=lambda value=value: audio.setResponderSpeaker(value))
-        self.device_menu.add_separator()
-        root_menu.add_cascade(label="Speaker Responder", menu=self.device_menu)
+            self.responderSpeaker_menu.add_command(label=key, command=lambda value=value: audio.setResponderSpeaker(value))
+        self.responderSpeaker_menu.add_separator()
+        root_menu.add_cascade(label="Speaker Responder", menu=self.responderSpeaker_menu)
         
         # Help Menu
         self.help_menu = tk.Menu(root_menu, tearoff=0)
@@ -212,17 +208,7 @@ class Application(tk.Frame):
         webbrowser.open("https://drive.google.com/a/tamu.edu/file/d/1pMKci4BTCTu7H6GREmmWEmBEgZ4klQWn/view?usp=sharing")
 
     def hello(self):
-<<<<<<< Updated upstream
-        '''
-        A test function
-        
-        Simply prints "Hello from Menu" to the console and the NotificationsFrame
-        '''
-        print("Hello from Menu")
-        self.notifications_frame.append_line("Hello from Menu")
-=======
         return True
->>>>>>> Stashed changes
         
 if __name__ == "__main__":
     root = tk.Tk()
