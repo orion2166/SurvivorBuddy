@@ -1,0 +1,2 @@
+06:21:01 - Position: P: 0 Y: 0 R: 0
+06:21:06 - Swapping Cameras...Please wait a few seconds.
