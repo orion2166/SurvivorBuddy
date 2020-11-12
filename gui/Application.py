@@ -119,6 +119,7 @@ class Application(tk.Frame):
         '''Closes the GUI application'''
         print("Closing")
         self.audio.stopAllComs()
+        self.thread1.closeCams()
         self.logFile.close()
         self.quit()
 
