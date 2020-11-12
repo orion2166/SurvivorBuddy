@@ -138,7 +138,7 @@ class Audio():
     def stopAllComs(self):
         self.stop_responderComs = True
         self.stop_survivorComs = True
-        time.sleep(3)
+        time.sleep(6)
 
     def survivorComs(self):
         self.stop_survivorComs = False

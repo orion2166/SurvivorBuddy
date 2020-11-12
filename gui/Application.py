@@ -116,11 +116,10 @@ class Application(tk.Frame):
     def close_app(self):    #Had to make new quit function to close file
         '''Closes the GUI application'''
         print("Closing")
-        self.audio.stopAllComs()
         self.thread1.closeCams()
+        self.audio.stopAllComs()
         self.logFile.close()
         self.quit()
-
 
     def create_menu(self, root_menu):
         '''
