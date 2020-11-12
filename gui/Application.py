@@ -11,6 +11,7 @@ from CamThread import camThread
 from datetime import datetime   #For log file formatting
 from PIL import Image, ImageTk
 from Audio import Audio
+import time
 import os.path
 import webbrowser
 import cv2
@@ -111,12 +112,13 @@ class Application(tk.Frame):
             self.canvas2.create_image(0, 0, anchor=tk.NW, image=self.image2)
 
         # Repeat every 'interval' ms
-        self.after(20, self.update_image)
+        self.after(10, self.update_image)
 
     def close_app(self):    #Had to make new quit function to close file
         '''Closes the GUI application'''
         print("Closing")
         self.thread1.closeCams()
+        time.sleep(0.5)
         self.audio.stopAllComs()
         self.logFile.close()
         self.quit()
