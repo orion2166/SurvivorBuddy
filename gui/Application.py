@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import tkinter as tk
 import tkinter.ttk as ttk
 from PositionFrame import PositionFrame
@@ -15,17 +14,12 @@ import os.path
 import webbrowser
 import cv2
 
-
 class Application(tk.Frame):
-    '''The main GUI class'''
-
     def __init__(self, master, **kwargs):
         '''
         The constructor for the Application class
-
         :param master: the Tk parent widget
         '''
-
         super().__init__(master, **kwargs)
         self.pack()
         self.taskbar_icon = tk.PhotoImage(file="SBLogo.png")
@@ -53,21 +47,27 @@ class Application(tk.Frame):
         self.notifications_frame = NotificationFrame(self.bottom, self.logFile)
 
         self.serial_arm_controller = SerialArmController(self.status_bar, self.notifications_frame)
-
-        self.cam = cv2.VideoCapture(1)
-
-        self.thread1 = camThread("Survivor Cam", 1, self.cam)
-        self.thread1.start()
-
-        self.vid = cv2.VideoCapture(0)
         
-        self.create_widgets(self.vid, self.cam)
+        self.create_widgets()
 
+<<<<<<< Updated upstream
     def create_widgets(self, vid, cam):
+=======
+        self.hello()
+
+    def create_widgets(self):
+>>>>>>> Stashed changes
         '''Creates the widgets seen in the GUI'''
 
         self.menu_bar = tk.Menu(self)
         self.create_menu(self.menu_bar)
+
+        self.vid = cv2.VideoCapture(0)
+        self.cam = cv2.VideoCapture(1)
+        self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
+        self.cam.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cam.set(cv2.CAP_PROP_FRAME_HEIGHT, 360)
 
         self.canvas = tk.Canvas(self.left, width = self.vid.get(cv2.CAP_PROP_FRAME_WIDTH), height = self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT))
         self.canvas.pack()
@@ -76,9 +76,6 @@ class Application(tk.Frame):
         self.canvas2.pack(side="left", expand=0)
 
         self.notifications_frame.pack(side="left", fill="x", expand=1)
-
-        self.interval = 10
-        self.update_image()
 
         self.position_frame = PositionFrame(self.right, self.serial_arm_controller, self.notifications_frame, self.logFile)
         self.position_frame.pack(side="top", expand=0)
@@ -90,6 +87,11 @@ class Application(tk.Frame):
 
         self.master.config(menu=self.menu_bar)
 
+        self.thread1 = camThread("Survivor Cam", 1, self.cam)
+        self.thread1.start()
+
+        self.update_image()
+
     def update_image(self):
         # Get the latest frame and convert image format
         self.image = cv2.cvtColor(self.vid.read()[1], cv2.COLOR_BGR2RGB) # to RGB
@@ -98,33 +100,28 @@ class Application(tk.Frame):
  
         # Update image
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.image)
-    
-        # Get the latest frame and convert image format
-        self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
-        self.image2 = cv2.resize(self.image2, (int(self.image2.shape[1] * 25 / 100), int(self.image2.shape[0] * 25 / 100)))
-        self.image2 = Image.fromarray(self.image2) # to PIL format
-        self.image2 = ImageTk.PhotoImage(self.image2) # to ImageTk format
- 
-        # Update image
-        self.canvas2.create_image(0, 0, anchor=tk.NW, image=self.image2)
+        if(self.cam.isOpened()):
+	        # Get the latest frame and convert image format
+	        self.image2 = cv2.cvtColor(self.cam.read()[1], cv2.COLOR_BGR2RGB) # to RGB
+	        self.image2 = cv2.resize(self.image2, (int(self.image2.shape[1] * 25 / 100), int(self.image2.shape[0] * 25 / 100)))
+	        self.image2 = Image.fromarray(self.image2) # to PIL format
+	        self.image2 = ImageTk.PhotoImage(self.image2) # to ImageTk format
+	        # Update image
+	        self.canvas2.create_image(0, 0, anchor=tk.NW, image=self.image2)
 
         # Repeat every 'interval' ms
-        self.after(self.interval, self.update_image)
+        self.after(20, self.update_image)
 
-    def close_app(self):    #Had to make new quit function to close file
+    def close_app(self):
         '''Closes the GUI application'''
-
         self.logFile.close()
         self.quit()
-
 
     def create_menu(self, root_menu):
         '''
         Creates the main GUI menu
-
         :param root_menu: The root menu (self.menu_bar) that is instantiated in create_widgets()
         '''
-
         # File Menu
         self.file_menu = tk.Menu(root_menu, tearoff=0)
         #self.file_menu.add_command(label="Preferences", command=self.hello)
@@ -181,7 +178,6 @@ class Application(tk.Frame):
 
     def refresh_devices(self):
         '''Refreshes the Devices menu'''
-
         self.device_menu.delete(2, 100)
         self.serial_arm_controller.update_devs()
         if not self.serial_arm_controller.devs:
@@ -196,19 +192,13 @@ class Application(tk.Frame):
     def connect(self, dev):
         '''
         Connects to the given device
-
         :param dev: The serial device to connect to
         '''
-
         self.serial_arm_controller.connect(dev[0])
-        self.device_menu.add_command(
-            label="Close Connection",
-            command=self.close
-        )
+        self.device_menu.add_command(label="Close Connection", command=self.close)
     
     def close(self):
         '''Closes the active serial connection'''
-
         self.device_menu.delete(2 + len(self.serial_arm_controller.devs))
         self.serial_arm_controller.close()
 
@@ -222,6 +212,7 @@ class Application(tk.Frame):
         webbrowser.open("https://drive.google.com/a/tamu.edu/file/d/1pMKci4BTCTu7H6GREmmWEmBEgZ4klQWn/view?usp=sharing")
 
     def hello(self):
+<<<<<<< Updated upstream
         '''
         A test function
         
@@ -229,9 +220,10 @@ class Application(tk.Frame):
         '''
         print("Hello from Menu")
         self.notifications_frame.append_line("Hello from Menu")
+=======
+        return True
+>>>>>>> Stashed changes
         
-        
-
 if __name__ == "__main__":
     root = tk.Tk()
     root.geometry("1200x600")

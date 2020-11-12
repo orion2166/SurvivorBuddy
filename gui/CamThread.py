@@ -1,6 +1,7 @@
 import cv2
 import threading
 
+
 class camThread(threading.Thread):
     def __init__(self, previewName, camID, cam):
         threading.Thread.__init__(self)
