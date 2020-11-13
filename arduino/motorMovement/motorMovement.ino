@@ -46,6 +46,10 @@ void landscape(){ //phoneMountServo moves phone to landscape position
     phoneMountServo.write(PHONEMOUNT_LANDSCAPE, 40, true);
 }
 
+void face_forward(){ //phoneMountServo moves phone to landscape position
+    setYaw(TABLETOP_FRONT);
+}
+
 void tilt() {
   int currAngle = phoneMountServo.read();
   for(int i =0; i < 3; i++){
@@ -208,9 +212,9 @@ void _shutdown() {
   delay(100);
   // blink LED then off
   for (int i = 0; i < 3; i++) {
-    digitalWrite(ledPin, LOW);
-    delay(500);
     digitalWrite(ledPin, HIGH);
+    delay(500);
+    digitalWrite(ledPin, LOW);
     delay(500);
   }
   sendPosition();
@@ -245,7 +249,7 @@ void setup() {
   Serial.setTimeout(100);
 
   pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, LOW);
+  digitalWrite(ledPin, HIGH);
 
   // feedback pins
   pinMode(leftBaseFeedback, INPUT);
@@ -296,6 +300,9 @@ void loop() {
     }
     else if (serialData[0] == 0x04){ // open
       up();
+    }
+    else if (serialData[0] == 0x05){ //portrait->face_forward
+      face_forward();
     }
     else if (serialData[0] == 0x06){ // landscape
       landscape();
