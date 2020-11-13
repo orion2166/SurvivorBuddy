@@ -1,8 +1,0 @@
-15:29:16 - Position: P: 0 Y: 0 R: 0
-15:35:02 - Position: P: 49 Y: 0 R: 0
-15:35:03 - Position: P: 79 Y: 0 R: 0
-15:35:05 - Position: P: 1 Y: 0 R: 0
-15:35:06 - Position: P: 90 Y: 0 R: 0
-15:35:09 - Position: P: 28 Y: 0 R: 0
-15:35:19 - Position: P: 28 Y: -35 R: 0
-15:35:21 - Position: P: 28 Y: 28 R: 0
