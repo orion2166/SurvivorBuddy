@@ -302,6 +302,7 @@ void loop() {
       up();
     }
     else if (serialData[0] == 0x05){ //portrait->face_forward
+      lastYaw = TABLETOP_FRONT;
       face_forward();
     }
     else if (serialData[0] == 0x06){ // landscape
