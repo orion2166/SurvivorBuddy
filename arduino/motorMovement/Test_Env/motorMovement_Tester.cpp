@@ -1,4 +1,17 @@
-#include <VarSpeedServo.h>
+#include "VarSpeedServo_Mock.h"
+
+//mock includes
+#include <chrono>
+#include <thread>
+
+//Mocked Definitions
+int A0 = 0;
+int A1 = 1;
+int A4 = 4;
+int LOW = 0;
+int HIGH = 1000;
+int INPUT = 1;
+int OUTPUT = 1;
 
 //Control and Feedback Pins
 //regular 180 servos
@@ -33,12 +46,46 @@ const int PHONEMOUNT_FB_LANDSCAPE = 0; //NEED CONSTANT LW
 
 
 //Create VarSpeedServo objects
-VarSpeedServo leftBaseServo;
-VarSpeedServo tabletopServo;
-VarSpeedServo phoneMountServo;
+VarSpeedServo_Mock leftBaseServo;
+VarSpeedServo_Mock tabletopServo;
+VarSpeedServo_Mock phoneMountServo;
+Serial serial;
 
 enum Command {PITCH, YAW, ROLL, CLOSE, OPEN, PORTRAIT,
               LANDSCAPE, NOD, SHAKE, TILT, SHUTDOWN};
+
+//Mocked Functions
+long map(long x, long in_min, long in_max, long out_min, long out_max) {
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
+void delay(int val){
+  std::this_thread::sleep_for(std::chrono::milliseconds(val));
+}
+
+void digitalWrite(int x, int y){
+  //do nothing
+}
+
+int analogRead(int x){
+  return (x + 1);
+}
+
+void pinMode(int x, int y){
+  //do nothing
+}
+
+int pulseIn(int x, int y){
+  return (x + y);
+}
+
+int setRoll_tester() {
+  return phoneMountServo.write_3_input;
+}
+
+int setPitchLeft_tester() {
+  return leftBaseServo.write_2_input;
+}
 
 /*******************************************************************/
 /*Phone Mount Functions*/
@@ -84,25 +131,25 @@ const unsigned long dutyScale = 1000;
 unsigned long tCycle, tHigh, tLow, dc;
 unsigned long theta;
 
-int getPositionTabletop(){
-  int tCycle = 0;
-  int tHigh, tLow, theta, dc;
-  while (1) {
-    tHigh = pulseIn(turnTableFeedback, HIGH);
-    tLow = pulseIn(turnTableFeedback, LOW);
-    tCycle = tHigh + tLow;
-    if ((tCycle > 1000) && (tCycle < 1200)) {
-      break;
-    }
-  }
-  dc = (dutyScale * tHigh) / tCycle;
-  theta = ((dc - dcMin) * unitsFC) / (dcMax - dcMin + 1);
-  if (theta < 0) {
-    theta = 0;
-  }
-  else if (theta > (unitsFC - 1)) {
-    theta = unitsFC - 1;
-  }
+int getPositionTabletop(int theta){
+  // int tCycle = 0;
+  // int tHigh, tLow, theta, dc;
+  // while (1) {
+  //   tHigh = pulseIn(turnTableFeedback, HIGH);
+  //   tLow = pulseIn(turnTableFeedback, LOW);
+  //   tCycle = tHigh + tLow;
+  //   if ((tCycle > 1000) && (tCycle < 1200)) {
+  //     break;
+  //   }
+  // }
+  // dc = (dutyScale * tHigh) / tCycle;
+  // theta = ((dc - dcMin) * unitsFC) / (dcMax - dcMin + 1);
+  // if (theta < 0) {
+  //   theta = 0;
+  // }
+  // else if (theta > (unitsFC - 1)) {
+  //   theta = unitsFC - 1;
+  // }
 
   if(theta < 180){
       theta = map(theta, TABLETOP_RIGHT, 0, 0, TABLETOP_RIGHT);
@@ -154,54 +201,66 @@ void nod(){
 }
 /*******************************************************************/
 /*Turn Table Motor Functions*/
-void setYaw(int val) {
+int setYaw(int val, int currPos) {
 //  int offset = 0;
-  int currPos = getPositionTabletop();
+  //int currPos = getPositionTabletop();
   if (val > currPos) {
+    //testing solution
+    return 1;
+    //
     tabletopServo.writeMicroseconds(1555);
     while (val > currPos + 10) {
-      currPos = getPositionTabletop();
+      currPos = getPositionTabletop(0);
     }
     tabletopServo.writeMicroseconds(1540);
     while (val > currPos+2) {
-      currPos = getPositionTabletop();
+      currPos = getPositionTabletop(0);
     }
   }
   else if (val < currPos) {
-
+    // testing solution
+    return 2;
+    //
     tabletopServo.writeMicroseconds(1430);
     while (val < currPos - 10) {
-      currPos = getPositionTabletop();
+      currPos = getPositionTabletop(0);
     }
     tabletopServo.writeMicroseconds(1440);
     while (val < currPos-2) {
-      currPos = getPositionTabletop();
+      currPos = getPositionTabletop(0);
     }
   }
+  return 0;
   tabletopServo.writeMicroseconds(1500);
 }
 
 void shake(){
-  int currPos = getPositionTabletop();
+  int currPos = getPositionTabletop(0);
   for(int i = 0; i < 3; i++){
-    setYaw(45);
+    setYaw(45,0);
     delay(100);
-    setYaw(45+90);
+    setYaw(45+90,0);
     delay(100);
   }
-  setYaw(currPos);
+  setYaw(currPos,0);
 }
 
-void sendPosition() {
+std::vector<int> sendPosition(int x) {
   char pos[3]; // [pitch, yaw, roll]
   pos[0] = map(leftBaseServo.read(), LEFT_BASE_DOWN, LEFT_BASE_UP, 0, 90);
-  pos[1] = map(getPositionTabletop(), 0, 180, 0, 180); //[REDUNDANT]
+  pos[1] = map(getPositionTabletop(x), 0, 180, 0, 180); //[REDUNDANT]
   pos[2] = map(phoneMountServo.read(), PHONEMOUNT_LANDSCAPE-PHONEMOUNT_MAX_TILT, PHONEMOUNT_LANDSCAPE+PHONEMOUNT_MAX_TILT, 0, 90);
-  Serial.write(pos, 3);
+  serial.write(pos, 3);
+  std::vector<int> vect;
+
+  vect.push_back(+(pos[0]));
+  vect.push_back(+(pos[1]));
+  vect.push_back(+(pos[2]));
+  return vect;
 }
 
 void _shutdown() {
-  setYaw(TABLETOP_FRONT);
+  setYaw(TABLETOP_FRONT,0);
   landscape();
   delay(100);
   down();
@@ -213,7 +272,7 @@ void _shutdown() {
     digitalWrite(ledPin, HIGH);
     delay(500);
   }
-  sendPosition();
+  sendPosition(0);
   //stop all motor movement. will need to unplug and plug back in to move again
   //while(true) {}
 }
@@ -241,8 +300,8 @@ void test() {
 
 /*******************************************************************/
 void setup() {
-  Serial.begin(9600);
-  Serial.setTimeout(100);
+  serial.begin(9600);
+  serial.setTimeout(100);
 
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, LOW);
@@ -254,7 +313,7 @@ void setup() {
 
   // attaches the servo on pin to the servo object
   tabletopServo.attach(turnTablePin);
-  setYaw(TABLETOP_FRONT);
+  setYaw(TABLETOP_FRONT,0);
   leftBaseServo.attach(leftBasePin);
   leftBaseServo.write(LEFT_BASE_DOWN, 60, true);
   phoneMountServo.attach(phoneMountPin);
@@ -273,8 +332,8 @@ void loop() {
 //  test();
 
   numLoops++;
-  if (Serial.available() > 0) {//serial is reading stuff
-    Serial.readBytes(serialData, 2);
+  if (serial.available() > 0) {//serial is reading stuff
+    serial.readBytes(serialData, 2);
     if (serialData[0] == 0x00) { // set pitch
       if (0 <= serialData[1] && serialData[1] <= 90) {
         setPitch(serialData[1]);
@@ -283,7 +342,7 @@ void loop() {
     else if (serialData[0] == 0x01) { // set yaw
       if (0 <= serialData[1] && serialData[1] <= 180) {
         lastYaw = map(serialData[1], 0, 180, 0, 180); //#####REDUNDANT#####
-        setYaw(lastYaw);
+        setYaw(lastYaw,0);
       }
     }
     else if (serialData[0] == 0x02) { // set roll
@@ -315,8 +374,8 @@ void loop() {
     }
   }
   if (numLoops % 100 == 0) {
-    setYaw(lastYaw);
-    sendPosition();
+    setYaw(lastYaw,0);
+    sendPosition(0);
     numLoops = 0;
   }
 
