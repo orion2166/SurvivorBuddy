@@ -23,13 +23,13 @@ class ControlButtons(tk.Frame):
         self.orientation = "PORTRAIT"
         self.create_buttons()
 
-        
+
     def create_buttons(self):
         '''Creates the control buttons displayed in the GUI'''
 
         self.top_frame = tk.Frame(self)
         self.top_frame.pack(fill="x")
-        
+
         # Open Arm button
         self.open_arm_btn = ttk.Button(self.top_frame,
             text="Open Arm", command=self.open_arm)
@@ -39,29 +39,29 @@ class ControlButtons(tk.Frame):
         self.close_arm_btn = ttk.Button(self.top_frame,
             text="Close Arm", command=self.close_arm)
         self.close_arm_btn.pack(side="left")
-        
+
         # Portrait button
         self.portrait_btn = ttk.Button(self.top_frame,
-            text="Portrait", command=self.portrait)
+            text="Face Forward", command=self.portrait)
         self.portrait_btn.pack(side="left")
-        
+
         self.landscape_btn= ttk.Button(self.top_frame,
             text="Landscape", command=self.landscape)
         self.landscape_btn.pack(side="left")
-        
+
         self.bottom_frame = tk.Frame(self)
         self.bottom_frame.pack(fill="x")
-        
+
         # Head Tilt button
         self.head_tilt_btn = ttk.Button(self.bottom_frame,
             text="Tilt Head", command=self.tilt)
         self.head_tilt_btn.pack(side="left")
-        
+
         # Nod Head button
         self.nod_head_btn = ttk.Button(self.bottom_frame,
             text="Nod Head", command=self.nod)
         self.nod_head_btn.pack(side="left")
-        
+
         # Shake Head button
         self.shake_head_btn = ttk.Button(self.bottom_frame,
             text="Shake Head", command=self.shake)
@@ -71,8 +71,8 @@ class ControlButtons(tk.Frame):
         self.shutdown_btn = ttk.Button(self.bottom_frame,
             text="Shutdown", command=self.shutdown)
         self.shutdown_btn.pack(side="left")
-        
-                
+
+
     def open_arm(self):
         '''Opens the arm using SerialArmController'''
 
@@ -94,15 +94,15 @@ class ControlButtons(tk.Frame):
 
                 
     def portrait(self):
-        '''Changes the arm to portrait mode using SerialArmController'''
+        '''Changes the arm to face foward mode using SerialArmController used to be portrait'''
 
         if self.serial_arm_controller.is_connected:
-            self.notifications_frame.append_line("Changing to portrait...")
+            self.notifications_frame.append_line("Changing to face forward...")
             self.serial_arm_controller.portrait()
             self.orientation = "PORTRAIT"
         else:
             self.notifications_frame.append_line("[DISCONNECTED] Changing to portrait...") #For offline testing
-                
+
 
     def landscape(self):
         '''Changes the arm to landscape mode using SerialArmController'''
@@ -113,7 +113,7 @@ class ControlButtons(tk.Frame):
             self.orientation = "LANDSCAPE"
         else:
             self.notifications_frame.append_line("[DISCONNECTED] Changing to landscape...") #For offline testing
-                
+
 
     def tilt(self):
         '''Tilts the arm using SerialArmController'''
@@ -124,7 +124,7 @@ class ControlButtons(tk.Frame):
         else:
             self.notifications_frame.append_line("[DISCONNECTED] Tilting head...") #For offline testing
 
-            
+
     def nod(self):
         '''Nods the arm using SerialArmController'''
 
@@ -134,7 +134,7 @@ class ControlButtons(tk.Frame):
         else:
             self.notifications_frame.append_line("[DISCONNECTED] Nodding head...") #For offline testing
 
-            
+
     def shake(self):
         '''Shakes the arm using SerialArmController'''
 
@@ -153,4 +153,3 @@ class ControlButtons(tk.Frame):
             self.serial_arm_controller._shutdown()
         else:
             self.notifications_frame.append_line("[DISCONNECTED] Shutting down...") #For offline testing
-        

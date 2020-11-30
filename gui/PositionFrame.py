@@ -268,10 +268,10 @@ class RenderDiagram(tk.Frame):
         self.draw_axes()    #redraw axes
         yaw = float(new_yaw) * np.pi / 180  #Convert angles to radians
         pitch = float(new_pitch) * np.pi / 180
-        roll = float(new_roll) * np.pi / 180
+        roll = (float(new_roll )+90) * np.pi / 180
         self.yawD = new_yaw
         self.pitchD = new_pitch
-        self.rollD = new_roll
+        self.rollD = str(float(new_roll) +90)
 
         self.ax.quiver(0.2, 1, 0, 0, -np.cos(pitch), np.sin(pitch), length=2, arrow_length_ratio=0, color = '#a83e32') #Arm wireframe
         self.ax.quiver(-0.2, 1, 0, 0, -np.cos(pitch), np.sin(pitch), length=2, arrow_length_ratio=0, color = '#a83e32')
@@ -403,11 +403,11 @@ class PositionFrame(tk.Frame):
         self.pitch_control.pack()
         
         self.yaw_control = LabelScaleSpinbox(
-            master, text="Green: ", from_Lable = "Left",to_Lable = "Right",from_=-90, to=90, axis=1, dev=self.serial_arm_controller)
+            master, text="Green: ", from_Lable = "Left",to_Lable = "Right",from_=90, to=-90, axis=1, dev=self.serial_arm_controller)
         self.yaw_control.pack()
         
         self.roll_control = LabelScaleSpinbox(
-            master, text="Blue: ", from_Lable = "Portrait",to_Lable = "Landscape",from_=0, to=90, axis=2, dev=self.serial_arm_controller)
+            master, text="Blue: ", from_Lable = "Counterclockwise",to_Lable = "Clockwise",from_= -45, to= 45, axis=2, dev=self.serial_arm_controller)
         self.roll_control.pack()
 
     def create_updater(self):
