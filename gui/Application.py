@@ -30,7 +30,7 @@ class Application(tk.Frame):
         super().__init__(master, **kwargs)
         self.pack()
         self.audio = Audio()
-        self.taskbar_icon = tk.PhotoImage(file="SBLogo.png")
+        self.taskbar_icon = tk.PhotoImage(file="SBLogo.gif")
         self.master.call('wm', 'iconphoto', self.master._w, self.taskbar_icon)
         self.config(padx=16, pady=16)
 

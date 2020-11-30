@@ -12,6 +12,8 @@ Welcome to Survivor Buddy 3.0's documentation!
    :numbered:
 
    src/application.rst
+   src/audio.rst
+   src/camthread.rst
    src/controlbuttons.rst
    src/notificationsframe.rst
    src/positionframe.rst
