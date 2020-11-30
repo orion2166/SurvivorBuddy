@@ -42,7 +42,7 @@ class ControlButtons(tk.Frame):
         
         # Portrait button
         self.portrait_btn = ttk.Button(self.top_frame,
-            text="Portrait", command=self.portrait)
+            text="Face Forward", command=self.portrait)
         self.portrait_btn.pack(side="left")
         
         self.landscape_btn= ttk.Button(self.top_frame,
@@ -94,10 +94,10 @@ class ControlButtons(tk.Frame):
 
                 
     def portrait(self):
-        '''Changes the arm to portrait mode using SerialArmController'''
+        '''Changes the arm to face foward mode using SerialArmController'''#used to be portrait
 
         if self.serial_arm_controller.is_connected:
-            self.notifications_frame.append_line("Changing to portrait...")
+            self.notifications_frame.append_line("Changing to face forward...")
             self.serial_arm_controller.portrait()
             self.orientation = "PORTRAIT"
         else:

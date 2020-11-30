@@ -132,8 +132,9 @@ class SerialArmController:
         pos = self.recv()
         if pos:
             self.position.pitch = int(pos[0])
-            self.position.yaw = int(pos[1] - 90)
-            self.position.roll = int(pos[2])
+            self.position.yaw = int(pos[1] - 90)*-1
+            self.position.roll = int(pos[2] - 45)*-1 
+            #flips the represented roll value from the arduino to match the gui
 
 
     def set_pitch(self, val):
@@ -157,7 +158,7 @@ class SerialArmController:
 
         # val is 1 byte
         if self.is_connected:
-            self.send(bytes((Command.YAW, val + 90)))
+            self.send(bytes((Command.YAW, (val*-1 + 90))))
             
 
     def set_roll(self, val):
@@ -169,7 +170,7 @@ class SerialArmController:
 
         # val is one byte
         if self.is_connected:
-            self.send(bytes((Command.ROLL, val)))
+            self.send(bytes((Command.ROLL, (val*-1 + 45))))
 
             
     def close_arm(self):
@@ -194,17 +195,17 @@ class SerialArmController:
         '''Sends the PORTRAIT command to the arm'''
 
         if self.is_connected:
-            if self.position.roll == 0:
-                self.notifications.append_line("WARNING: ALREADY IN PORTRAIT")
+            if self.position.yaw > -5 and self.position.yaw < 5:
+                self.notifications.append_line("WARNING: ALREADY FACING FORWARD")
             else:
-                self.send(bytes((Command.PORTRAIT, 0)))
+                self.send(bytes((Command.PORTRAIT, 90))) 
                 
 
     def landscape(self):
         '''Sends the LANDSCAPE command to the arm'''
 
         if self.is_connected:
-            if self.position.roll == 90:
+            if self.position.roll > -2 and self.position.roll < 2:
                 self.notifications.append_line("WARNING: ALREADY IN LANDSCAPE")
             else:
                 self.send(bytes((Command.LANDSCAPE, 0)))
