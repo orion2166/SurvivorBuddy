@@ -35,3 +35,5 @@ sphinxcontrib-qthelp==1.0.3
 sphinxcontrib-serializinghtml==1.1.4
 urllib3==1.25.9
 wrapt==1.11.2
+opencv-python==4.4.0.46
+sounddevice=0.4.1

@@ -10,17 +10,18 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
+
 import os
 import sys
+autodoc_mock_imports = ["matplotlib","serial","sounddevice","tk","numpy","mpl_toolkits","cv2","PIL"]
 sys.path.insert(0, os.path.abspath('../..'))
 sys.setrecursionlimit(1500)
 
-
 # -- Project information -----------------------------------------------------
 
-project = 'Survivor Buddy 3.0'
+project = 'Survivor Buddy 4.0'
 #copyright = '2020, Ben Shiller, Joseph Duran, Philip Rettenmaier, Kimberly Ramos, Yara Mohamed'
-author = 'Ben Shiller, Joseph Duran, Philip Rettenmaier, Yara Mohamed, Kimberly Ramos'
+author = 'Cole Bui, Jared DeLeon, Lewis Wooler, Royce Yu, Savannah Yu'
 
 # The full version, including alpha/beta/rc tags
 release = '0.1.0'
