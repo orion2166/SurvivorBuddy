@@ -33,13 +33,13 @@ class Application(tk.Frame):
         self.taskbar_icon = tk.PhotoImage(file="SBLogo.png")
         self.master.call('wm', 'iconphoto', self.master._w, self.taskbar_icon)
         self.config(padx=16, pady=16)
-        
+
         self.cam0 = 0
         self.cam1 = 1
 
         now = datetime.now()    #Create unique logfile for notifications and errors
         timestamp = now.strftime("%m_%d_%Y_%H_%M_%S")
-        file_name = 'LOGFILE_' + timestamp +'.txt'        
+        file_name = 'LOGFILE_' + timestamp +'.txt'
         self.logFile = open(os.path.join(os.path.realpath('../logs/'), file_name) , 'w+')   #Save logfile to log folder
 
         self.topside = tk.Frame(self)
@@ -58,7 +58,7 @@ class Application(tk.Frame):
         self.notifications_frame = NotificationFrame(self.bottom, self.logFile)
 
         self.serial_arm_controller = SerialArmController(self.status_bar, self.notifications_frame)
-        
+
         self.create_widgets()
 
         self.hello()
@@ -100,6 +100,7 @@ class Application(tk.Frame):
         self.update_image()
 
     def update_image(self):
+        """Display video feed on GUI"""
         # Get the latest frame and convert image format
         self.image = cv2.cvtColor(self.vid.read()[1], cv2.COLOR_BGR2RGB) # to RGB
         self.image = Image.fromarray(self.image) # to PIL format
@@ -140,17 +141,17 @@ class Application(tk.Frame):
         #self.file_menu.add_command(label="Preferences", command=self.hello)
         self.file_menu.add_command(label="Quit", command=self.close_app)
         root_menu.add_cascade(label="File", menu=self.file_menu)
-        
+
         # Device Menu
         self.device_menu = tk.Menu(root_menu, tearoff=0)
         self.device_menu.add_command(label="Refresh Devices", command=self.refresh_devices)
         self.device_menu.add_command(label="Swap Cameras", command=self.swap_cams)
         self.device_menu.add_separator()
         root_menu.add_cascade(label="Device", menu=self.device_menu)
-        
+
         #Survivor mic menu
         self.survivorMic_menu = tk.Menu(root_menu, tearoff=0)
-        
+
         inputDeviceList = self.audio.createInputDeviceList()
         outputDeviceList = self.audio.createOutputDeviceList()
 
@@ -181,7 +182,7 @@ class Application(tk.Frame):
             self.responderSpeaker_menu.add_command(label=key, command=lambda value=value: self.audio.setResponderSpeaker(value))
         self.responderSpeaker_menu.add_separator()
         root_menu.add_cascade(label="Speaker Responder", menu=self.responderSpeaker_menu)
-        
+
         # Help Menu
         self.help_menu = tk.Menu(root_menu, tearoff=0)
         self.help_menu.add_command(label="About Survivor Buddy 3.0", command=self.open_survivor_buddy_page)
@@ -190,6 +191,7 @@ class Application(tk.Frame):
         root_menu.add_cascade(label="Help", menu=self.help_menu)
 
     def swap_cams(self):
+        """Swaps the video feeds of the cameras and restarts reading"""
         self.cam0, self.cam1 = self.cam1, self.cam0
 
         self.vid = cv2.VideoCapture(self.cam0)
@@ -212,8 +214,8 @@ class Application(tk.Frame):
                 self.device_menu.add_command(
                     label="{}: {}".format(dev[0], dev[1]),
                     command=lambda: self.connect(dev)
-                )        
-            
+                )
+
     def connect(self, dev):
         '''
         Connects to the given device
@@ -226,7 +228,7 @@ class Application(tk.Frame):
             label="Close Connection",
             command=self.close
         )
-    
+
     def close(self):
         '''Closes the active serial connection'''
 
@@ -235,22 +237,22 @@ class Application(tk.Frame):
 
     def open_survivor_buddy_page(self):
         webbrowser.open("http://survivorbuddy.cse.tamu.edu/")
-        
+
     def open_user_manual(self):
-        webbrowser.open("https://docs.google.com/document/d/1V6gmVehsxrlFoc5FzThtdTNSovUbyU03AUEBfnAclKA/edit?usp=sharing")
+        webbrowser.open("https://docs.google.com/document/d/1R8EoDpHty-4koPctWnWqsMqm2f33flMNHz9udNbOJyI/edit?usp=sharing")
 
     def open_programmer_reference(self):
-        webbrowser.open("https://drive.google.com/a/tamu.edu/file/d/1pMKci4BTCTu7H6GREmmWEmBEgZ4klQWn/view?usp=sharing")
+        webbrowser.open("https://docs.google.com/document/d/1Btq05vL-D9OLQX8jE-4fCh52cFOKOmOiuSuUi-WqG-Q/edit?usp=sharing")
 
     def hello(self):
         '''
         A test function
-        
+
         Simply prints "Hello from Menu" to the console and the NotificationsFrame
         '''
         return True
-        
-        
+
+
 
 if __name__ == "__main__":
     root = tk.Tk()

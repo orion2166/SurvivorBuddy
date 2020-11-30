@@ -2,8 +2,9 @@ import cv2
 import threading
 
 class camThread(threading.Thread):
-    
+
     def __init__(self, previewName, camID, cam):
+        """Initializes the camera device"""
         threading.Thread.__init__(self)
         self.previewName = previewName
         self.camID = camID
@@ -11,9 +12,11 @@ class camThread(threading.Thread):
         self.rval = False
 
     def run(self):
+        """Helper to start camera thread"""
         self.camPreview(self.previewName, self.cam)
 
     def camPreview(self, previewName, cam):
+        """Creates responder video reading"""
         cv2.namedWindow(previewName)
         if cam.isOpened():  # try to get the first frame
             self.rval, frame = cam.read()
@@ -29,7 +32,9 @@ class camThread(threading.Thread):
         cv2.destroyWindow(previewName)
 
     def closeCams(self):
+        """Stops reading of camera"""
         self.rval = False
 
 def checkKey(key):
-        return key == 27
+    """Helper function for key"""
+    return key == 27

@@ -40,11 +40,11 @@ class Position:
         self.pitch = pitch
         self.yaw = yaw
         self.roll = roll
-        
+
     def __str__(self):
         return "P: {}, Y: {}, R: {}".format(self.pitch, self.yaw, self.roll)
 
-        
+
 class SerialArmController:
     '''Send commands to the robot arm and receives data from the arm'''
 
@@ -63,7 +63,7 @@ class SerialArmController:
         self.devs = []
         self.position = Position()
         self.is_connected = False
-        
+
 
     def update_devs(self):
         '''Updates the list of available devices'''
@@ -78,7 +78,7 @@ class SerialArmController:
                 self.devs.append((dev.device, "Leonardo"))
             elif dev.vid == ARDUINO_VID and dev.pid == UNO_PID:
                 self.devs.append((dev.device, "Uno"))
-           
+
 
     def connect(self, comport):
         '''
@@ -91,8 +91,8 @@ class SerialArmController:
             self._device = serial.Serial(comport, timeout=1)
             self.status_bar.set_status("CONNECTED")
             self.is_connected = True
-        
-        
+
+
     def close(self):
         '''Closes the current connection'''
 
@@ -100,7 +100,7 @@ class SerialArmController:
             self._device.close()
             self.status_bar.set_status("DISCONNECTED")
             self.is_connected = False
-        
+
 
     def send(self, data):
         '''
@@ -112,11 +112,11 @@ class SerialArmController:
             print("Sending: \"{}\"".format(data))
             self._device.write(data)
 
-        
+
     def recv(self):
         '''
         Receives data from the arm
-        
+
         :returns: data - bytes from the arm
         '''
 
@@ -133,7 +133,7 @@ class SerialArmController:
         if pos:
             self.position.pitch = int(pos[0])
             self.position.yaw = int(pos[1] - 90)*-1
-            self.position.roll = int(pos[2] - 45)*-1 
+            self.position.roll = int(pos[2] - 45)*-1
             #flips the represented roll value from the arduino to match the gui
 
 
@@ -147,7 +147,7 @@ class SerialArmController:
         # val is one byte
         if self.is_connected:
             self.send(bytes((Command.PITCH, val)))
-            
+
 
     def set_yaw(self, val):
         '''
@@ -159,7 +159,7 @@ class SerialArmController:
         # val is 1 byte
         if self.is_connected:
             self.send(bytes((Command.YAW, (val*-1 + 90))))
-            
+
 
     def set_roll(self, val):
         '''
@@ -172,7 +172,7 @@ class SerialArmController:
         if self.is_connected:
             self.send(bytes((Command.ROLL, (val*-1 + 45))))
 
-            
+
     def close_arm(self):
         '''Sends the CLOSE command to the arm'''
 
@@ -180,7 +180,7 @@ class SerialArmController:
             self.notifications.append_line("WARNING: ARM ALREADY CLOSED")
         else:
             self.send(bytes((Command.CLOSE, 0)))
-        
+
 
     def open_arm(self):
         '''Sends the OPEN command to the arm'''
@@ -189,17 +189,17 @@ class SerialArmController:
             self.notifications.append_line("WARNING: ARM ALREADY OPEN")
         else:
             self.send(bytes((Command.OPEN, 0)))
-        
+
 
     def portrait(self):
-        '''Sends the PORTRAIT command to the arm'''
+        '''Sends the FACE FORWARD command to the arm (used to be portrait)'''
 
         if self.is_connected:
             if self.position.yaw > -5 and self.position.yaw < 5:
                 self.notifications.append_line("WARNING: ALREADY FACING FORWARD")
             else:
-                self.send(bytes((Command.PORTRAIT, 90))) 
-                
+                self.send(bytes((Command.PORTRAIT, 90)))
+
 
     def landscape(self):
         '''Sends the LANDSCAPE command to the arm'''
@@ -209,14 +209,14 @@ class SerialArmController:
                 self.notifications.append_line("WARNING: ALREADY IN LANDSCAPE")
             else:
                 self.send(bytes((Command.LANDSCAPE, 0)))
-                
+
 
     def tilt(self):
         '''Sends the TILT command to the arm'''
 
         if self.is_connected:
             self.send(bytes((Command.TILT, 0)))
-            
+
 
     def nod(self):
         '''Sends the NOD command to the arm'''
@@ -224,7 +224,7 @@ class SerialArmController:
         if self.is_connected:
             self.send(bytes((Command.NOD, 0)))
 
-            
+
     def shake(self):
         '''Sends the SHAKE command to the arm'''
 
@@ -239,4 +239,3 @@ class SerialArmController:
             self.send(bytes((Command.SHUTDOWN, 0)))
             time.sleep(4)
             self.close()
-        

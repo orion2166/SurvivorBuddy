@@ -1,7 +1,4 @@
 #!/usr/bin/env python3
-"""Pass input directly to output.
-https://app.assembla.com/spaces/portaudio/git/source/master/test/patest_wire.c
-"""
 import argparse
 import time
 from threading import Thread
@@ -12,8 +9,9 @@ assert numpy  # avoid "imported but unused" message (W0611)
 
 
 class Audio():
-    
+
     def __init__(self):
+        """Initialize variables"""
         self.SAMPLERATE = 44100
         self.CHANNELS = 2 # python -m sounddevice
         #print (sd.query_devices())
@@ -25,7 +23,7 @@ class Audio():
         self.survivorComsOn = False
         self.stop_responderComs = False
         self.stop_survivorComs = False
-        
+
     def int_or_str(self, text):
         """Helper function for argument parsing."""
         try:
@@ -34,15 +32,18 @@ class Audio():
             return text
 
     def initializeStart(self):
+        """Displays current default device"""
         print('default.device='+str(sd.default.device), flush=True)
         ##sd.default.device = sd.query_devices()
-        
+
     def callback(self, indata, outdata, frames, time, status):
+        """Helper function for sounddevice library"""
         if status:
             print(status, flush=True)
         outdata[:] = indata
 
     def createOutputDeviceList(self):
+        """Generate list of output devices (speakers)"""
         deviceList = sd.query_devices()
         newList = {}
         #print(deviceList)
@@ -55,6 +56,7 @@ class Audio():
         return newList
 
     def createInputDeviceList(self):
+        """Generate list of input devices (microphones)"""
         deviceList = sd.query_devices()
         newList = {}
         for index, i in enumerate(deviceList):
@@ -64,26 +66,31 @@ class Audio():
         return newList
 
     def setSurvivorSpeaker(self, survivorSpeaker):
+        """Setter for survivor speaker device"""
         #print("set survivorSpeaker with "+str(survivorSpeaker), flush=True)
         self.survivorSpeaker = survivorSpeaker
         self.checkResponderComsReady()
 
     def setSurvivorMic(self, survivorMic):
+        """Setter for survivor mic device"""
         #print("set survivorMic with "+str(survivorMic), flush=True)
         self.survivorMic = survivorMic
         self.checkSurvivorComsReady()
 
     def setResponderSpeaker(self, responderSpeaker):
+        """Setter for responder speaker device"""
         #print("set responderSpeaker with "+str(responderSpeaker), flush=True)
         self.responderSpeaker = responderSpeaker
         self.checkSurvivorComsReady()
 
     def setResponderMic(self, responderMic):
+        """Setter for responder mic device"""
         #print("set responderMic with "+str(responderMic), flush=True)
         self.responderMic = responderMic
         self.checkResponderComsReady()
 
     def checkResponderComsReady(self):
+        """Checker for starting responder communications"""
         if (self.responderMic != -1 and self.survivorSpeaker != -1 and not self.responderComsOn):
             self.responderComsOn = True
             Thread(target = self.responderComs).start()
@@ -94,6 +101,7 @@ class Audio():
             self.checkResponderComsReady()
 
     def checkSurvivorComsReady(self):
+        """Checker for starting survivor communications"""
         if (self.survivorMic != -1 and self.responderSpeaker != -1 and not self.survivorComsOn):
             self.survivorComsOn = True
             Thread(target = self.survivorComs).start()
@@ -102,9 +110,10 @@ class Audio():
             time.sleep(3)
             self.survivorComsOn = False
             self.checkSurvivorComsReady()
-            
+
 
     def responderComs(self):
+        """Starts responder communication"""
         self.stop_responderComs = False
         runningResponderComs = False
         print('#' * 80, flush=True)
@@ -131,16 +140,18 @@ class Audio():
             self.stop_responderComs = True
             print("Responder Coms exception:", flush=True)
         return runningResponderComs
-        
+
     def pauseUntilUserInput(self):
         return input()
 
     def stopAllComs(self):
+        """Stops all sounddevice communications"""
         self.stop_responderComs = True
         self.stop_survivorComs = True
         time.sleep(6)
 
     def survivorComs(self):
+        """Starts survivor communication"""
         self.stop_survivorComs = False
         print('#' * 80, flush=True)
         print("survivor coms started", flush=True)
@@ -151,7 +162,7 @@ class Audio():
                             dtype=sd.default.dtype, latency=sd.default.latency,
                             channels=sd.default.channels, callback=self.callback):
                     print('#' * 80, flush=True)
-                    
+
                     while True:
                         time.sleep(2)
                         if (self.stop_survivorComs):
@@ -164,7 +175,7 @@ class Audio():
             self.survivorComsOn = False
             self.stop_survivorComs = True
             print("Survivor Coms exception", flush=True)
-        
+
 
 # audio = Audio()
 # audio.createDeviceList()
